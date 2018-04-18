@@ -1,0 +1,132 @@
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: cbfb2024ed192fca969139f4a73854ab2122d27fb4287f7b3c42cc4b8d04b420
+
+name:           pet-store
+version:        0.0.0
+synopsis:       A Simple model for a Pet Store app
+build-type:     Simple
+cabal-version:  >= 1.10
+
+library
+  hs-source-dirs:
+      src
+  default-extensions: OverloadedStrings RecordWildCards ScopedTypeVariables
+  ghc-options: -Wall -fno-warn-orphans
+  build-depends:
+      QuickCheck
+    , aeson
+    , async
+    , base
+    , bytestring
+    , http-client
+    , ioautomata
+    , mtl
+    , network
+    , pet-store-backend
+    , random
+    , servant
+    , servant-client
+    , servant-server
+    , text
+    , wai-extra
+    , warp
+  exposed-modules:
+      PetStore.Model
+      PetStore.Mock
+      PetStore.Driver
+  other-modules:
+      Paths_pet_store
+  default-language: Haskell2010
+
+executable driver-petstore
+  main-is: driver.hs
+  hs-source-dirs:
+      driver
+  build-depends:
+      QuickCheck
+    , aeson
+    , async
+    , base
+    , bytestring
+    , containers
+    , http-client
+    , http-types
+    , ioautomata
+    , mtl
+    , network
+    , pet-store
+    , pet-store-backend
+    , random
+    , servant
+    , servant-client
+    , servant-server
+    , stm
+    , text
+    , unagi-chan
+    , wai
+    , wai-middleware-static
+    , wai-websockets
+    , warp
+    , websockets
+  other-modules:
+      Paths_pet_store
+  default-language: Haskell2010
+
+executable mock-petstore
+  main-is: mock.hs
+  hs-source-dirs:
+      mock
+  default-extensions: OverloadedStrings RecordWildCards ScopedTypeVariables
+  build-depends:
+      QuickCheck
+    , aeson
+    , async
+    , base
+    , bytestring
+    , containers
+    , http-client
+    , http-types
+    , ioautomata
+    , mtl
+    , network
+    , pet-store
+    , pet-store-backend
+    , servant
+    , servant-server
+    , stm
+    , text
+    , unagi-chan
+    , wai
+    , wai-middleware-static
+    , wai-websockets
+    , warp
+    , websockets
+  other-modules:
+      Paths_pet_store
+  default-language: Haskell2010
+
+test-suite tests
+  type: exitcode-stdio-1.0
+  main-is: Tests.hs
+  hs-source-dirs:
+      tests
+  build-depends:
+      QuickCheck
+    , base
+    , containers
+    , data-reify
+    , directory
+    , hspec
+    , hspec-discover
+    , ioautomata
+    , mtl
+    , pet-store
+    , pet-store-backend
+    , random
+  other-modules:
+      PetStoreSpec
+      Paths_pet_store
+  default-language: Haskell2010
