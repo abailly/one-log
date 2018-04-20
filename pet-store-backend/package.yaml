@@ -12,6 +12,7 @@ library:
     - bytestring
     - containers
     - data-default
+    - http-client
     - lens
     - mtl
     - network

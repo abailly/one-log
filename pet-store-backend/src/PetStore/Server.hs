@@ -20,6 +20,7 @@ import           PetStore.Api
 import           PetStore.Config
 import           PetStore.Handler
 import           PetStore.Log
+import           PetStore.Payment.Api
 import           PetStore.Store
 import           PetStore.Swagger
 import           Servant
@@ -28,15 +29,16 @@ startServer :: ServerConfig -> IO ()
 startServer conf@ServerConfig{..} = do
   mlog $ "Starting PetStore Server: " <> show conf
   store <- makeStore
-  void $ run listeningPort $ doLog operationMode $ server store operationMode
+  paymentClient <- makeClient paymentHost paymentPort
+  void $ run listeningPort $ doLog operationMode $ server store operationMode paymentClient
     where
       doLog Dev  = logStdoutDev
       doLog Prod = logStdout
 
       runServer store = NT $ Handler . flip runReaderT store
 
-      server store Prod = serve petStoreApi $ enter (runServer store) prodHandler
-      server store Dev  = serve devPetStoreApi $ enter (runServer store) devHandler
+      server store Prod paymentClient = serve petStoreApi $ enter (runServer store) (prodHandler paymentClient)
+      server store Dev  paymentClient = serve devPetStoreApi $ enter (runServer store) (devHandler paymentClient)
 
-      prodHandler = listPets :<|> addPet :<|> removePet :<|> login :<|> logout :<|> addToBasket :<|> removeFromBasket :<|> checkout :<|> listBasket
-      devHandler  = prodHandler :<|> reset :<|> pure petStoreSwagger
+      prodHandler paymentClient = listPets :<|> addPet :<|> removePet :<|> login :<|> logout :<|> addToBasket :<|> removeFromBasket :<|> checkout paymentClient :<|> listBasket
+      devHandler  paymentClient = prodHandler paymentClient :<|> reset :<|> pure petStoreSwagger

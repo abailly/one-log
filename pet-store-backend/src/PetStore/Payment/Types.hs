@@ -26,6 +26,7 @@ checkCardNumber Payment{cardNumber} =
          else n
 
 data PaymentResult = PaymentResult { _id     :: Integer
-                                   , _result :: String
+                                   , _result :: Bool
                                    }
+                   | PaymentError { _reason :: String }
   deriving (Eq,Show,Generic,ToJSON,FromJSON)

@@ -9,6 +9,7 @@ import           Control.Monad.Except
 import           Control.Monad.Reader
 import           PetStore.Log
 import           PetStore.Messages
+import           PetStore.Payment.Api
 import           PetStore.Store
 import           Servant
 
@@ -39,8 +40,13 @@ addToBasket user pet =  ask >>= send (AddToBasket user pet)
 removeFromBasket :: User -> Pet -> PetServer m Output
 removeFromBasket user pet =  ask >>= send (RemoveFromBasket user pet)
 
-checkout         :: User -> Payment -> PetServer m Output
-checkout user payment =  ask >>= send (CheckoutBasket user payment)
+checkout         :: PaymentClient -> User -> Payment -> PetServer m Output
+checkout paymentClient user payment = do
+  store <- ask
+  res <- liftIO $ paymentClient payment
+  case res of
+    PaymentResult _ True -> send (CheckoutBasket user payment) store
+    _                    -> pure (Error InvalidPayment)
 
 listBasket       :: User -> PetServer m Output
 listBasket user = ask >>= send (GetUserBasket user)
