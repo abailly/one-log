@@ -80,9 +80,8 @@ act GetUserBasket { user } Store{baskets}
     userBasket     = fromJust $ Map.lookup user baskets
 
 act CheckoutBasket { user, payment } Store{baskets}
-  | not (user `member` baskets)      = Error UserNotLoggedIn
-  | checkCardNumber payment          = CheckedOutBasket user payment basketAmount
-  | otherwise                        = Error InvalidPayment
+  | not (user `member` baskets)  = Error UserNotLoggedIn
+  | otherwise                    = CheckedOutBasket user payment basketAmount
   where
     userBasket     = fromJust $ Map.lookup user baskets
     basketAmount   = foldr (+) 0 $ fmap petPrice userBasket

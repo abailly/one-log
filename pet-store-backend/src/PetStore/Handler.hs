@@ -7,6 +7,7 @@ module PetStore.Handler where
 import           Control.Concurrent.MVar
 import           Control.Monad.Except
 import           Control.Monad.Reader
+import           Data.Monoid             ((<>))
 import           PetStore.Log
 import           PetStore.Messages
 import           PetStore.Payment.Api
@@ -46,7 +47,7 @@ checkout paymentClient user payment = do
   res <- liftIO $ paymentClient payment
   case res of
     PaymentResult _ True -> send (CheckoutBasket user payment) store
-    _                    -> pure (Error InvalidPayment)
+    _                    -> mlog ("failed to validate payment" <> show res) >> pure (Error InvalidPayment)
 
 listBasket       :: User -> PetServer m Output
 listBasket user = ask >>= send (GetUserBasket user)
