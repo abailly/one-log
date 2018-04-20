@@ -21,3 +21,5 @@ node-modules/
 \#~
 .mvn
 TAGS
+target/
+store.db
