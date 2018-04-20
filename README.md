@@ -1,8 +1,21 @@
+# One Log
+
+## Install
+
+* Requires installing [stack]() and [maven]() (which implies installing Java)
+* To build all the needed components on Unixish systems:
+
+```
+$ ./Build.hs build
+```
+
+
 # TODO
 
 * [x] base client/server app with textual traces in Haskell
 * [x] add another service in Java
 * [x] connect the 2 services
+* [x] build script
 * [ ] structure logging in JSON
 * [ ] merge logs from 2 services by tailing containers
 * [ ] add opentracing IDs to logs
