@@ -1,0 +1,20 @@
+flags: {}
+packages:
+  - location:
+      git: 'https://github.com/abailly/ioautomata.git'
+      commit: 'c68ccf4'
+    extra-dep: true
+  - 'pet-store'
+  - 'pet-store-backend'
+
+extra-deps:
+  - unagi-chan-0.4.0.0
+  - MonadPrompt-1.0.0.5
+resolver: lts-10.3
+image:
+  containers:
+    -
+      base: "fpco/stack-run"
+      name: "aleryo/pet-store"
+      entrypoints:
+        - pet-store-server
