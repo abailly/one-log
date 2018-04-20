@@ -31,7 +31,7 @@ data Store = Store { storedPets :: [ Pet ]
                    }
 
 send :: (MonadIO m) => Input -> StoreDB -> m Output
-send input storedb = withinLog input $ liftIO $ modifyMVar storedb $ \ store@Store{..} -> do
+send input storedb = withinLog (show input) $ liftIO $ modifyMVar storedb $ \ store@Store{..} -> do
   let event = act input store
   hPutStrLn eventSink (decodeUtf8 $ encode event)
   IO.hFlush eventSink

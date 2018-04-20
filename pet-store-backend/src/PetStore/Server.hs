@@ -26,10 +26,10 @@ startServer :: ServerMode -> Int -> IO ()
 startServer devMode port = do
   putStrLn $ "Starting PetStore Server: " <> show port
   store <- makeStore
-  logger <- doLog devMode
-  void $ run port $ logger $ server store devMode
+  void $ run port $ doLog devMode $ server store devMode
     where
-      doLog _ = mkRequestLogger $ def { outputFormat = CustomOutputFormatWithDetails formatAsJSON }
+      doLog Dev  = logStdoutDev
+      doLog Prod = logStdout
 
       runServer store = NT $ Handler . flip runReaderT store
 
