@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8254d2d31d323ce3319e4e73feceb99b79792d762d03d0d476401bda7d02ffb2
+-- hash: 42bb2036381a5ef972a2f3b1cb205ecdc34d132e116c3cced71b21dd864cde3f
 
 name:           pet-store-backend
 version:        0.0.0
@@ -13,7 +13,7 @@ cabal-version:  >= 1.10
 library
   hs-source-dirs:
       src
-  default-extensions: OverloadedStrings RecordWildCards ScopedTypeVariables
+  default-extensions: OverloadedStrings RecordWildCards ScopedTypeVariables MonoLocalBinds
   ghc-options: -Wall -fno-warn-orphans
   build-depends:
       aeson
@@ -27,6 +27,7 @@ library
     , network
     , random
     , servant
+    , servant-client
     , servant-server
     , servant-swagger
     , swagger2
@@ -38,9 +39,12 @@ library
       PetStore.Api
       PetStore.Messages
       PetStore.Server
+      PetStore.Config
   other-modules:
       PetStore.Handler
       PetStore.Log
+      PetStore.Payment.Api
+      PetStore.Payment.Types
       PetStore.Store
       PetStore.Swagger
       Paths_pet_store_backend

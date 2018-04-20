@@ -44,27 +44,27 @@ resetStore db = liftIO $ modifyMVar_  db $ \ Store{..} -> do
   pure $ Store [] Map.empty eventSink
 
 act :: Input -> Store -> Output
-act Add{pet}  store@Store{storedPets}
+act Add{pet}  Store{storedPets}
   | pet `notElem` storedPets = PetAdded pet
   | otherwise                = Error PetAlreadyAdded
 
-act Remove{pet}  store@Store{storedPets}
+act Remove{pet}  Store{storedPets}
   | pet `notElem` storedPets = Error PetDoesNotExist
   | otherwise                = PetRemoved pet
 
 -- Actually a Query not a Command
-act ListPets          s@Store{storedPets}
+act ListPets          Store{storedPets}
   = Pets storedPets
 
-act UserLogin { user }               store@Store{ baskets}
+act UserLogin { user }               _
   = UserLoggedIn user
 
-act AddToBasket { user, pet }        store@Store{storedPets, baskets}
+act AddToBasket { user, pet }        Store{storedPets, baskets}
   | not (user `member` baskets) = Error UserNotLoggedIn
   | pet `notElem` storedPets    = Error PetDoesNotExist
   | otherwise                   = AddedToBasket user pet
 
-act RemoveFromBasket { user, pet}    store@Store{storedPets, baskets}
+act RemoveFromBasket { user, pet}    Store{baskets}
   | not (user `member` baskets)  = Error UserNotLoggedIn
   | fmap (pet `notElem`) userBasket
     == Just True                     = Error PetNotInBasket
@@ -73,13 +73,13 @@ act RemoveFromBasket { user, pet}    store@Store{storedPets, baskets}
   where
     userBasket = Map.lookup user baskets
 
-act GetUserBasket { user } store@Store{baskets}
+act GetUserBasket { user } Store{baskets}
   | not (user `member` baskets)  = Error UserNotLoggedIn
   | otherwise                    = UserBasket user userBasket
   where
     userBasket     = fromJust $ Map.lookup user baskets
 
-act CheckoutBasket { user, payment } store@Store{baskets}
+act CheckoutBasket { user, payment } Store{baskets}
   | not (user `member` baskets)      = Error UserNotLoggedIn
   | checkCardNumber payment          = CheckedOutBasket user payment basketAmount
   | otherwise                        = Error InvalidPayment
@@ -87,7 +87,7 @@ act CheckoutBasket { user, payment } store@Store{baskets}
     userBasket     = fromJust $ Map.lookup user baskets
     basketAmount   = foldr (+) 0 $ fmap petPrice userBasket
 
-act UserLogout { user }              store@Store{storedPets, baskets}
+act UserLogout { user }              Store{baskets}
   | not (user `member` baskets)      = Error UserNotLoggedIn
   | otherwise                        = UserLoggedOut user
 

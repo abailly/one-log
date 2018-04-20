@@ -24,9 +24,6 @@ type DevPetStoreApi = PetStoreApi
                       :<|> "swagger.json" :> Get '[JSON] Swagger
 
 
-data ServerMode = Prod | Dev
-  deriving (Eq, Show, Read)
-
 petStoreApi :: Proxy PetStoreApi
 petStoreApi = Proxy
 

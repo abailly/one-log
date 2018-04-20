@@ -18,6 +18,7 @@ library:
     - random
     - servant
     - servant-server
+    - servant-client
     - servant-swagger
     - swagger2
     - text
@@ -28,10 +29,12 @@ library:
     - PetStore.Api
     - PetStore.Messages
     - PetStore.Server
+    - PetStore.Config
   default-extensions:
     - OverloadedStrings
     - RecordWildCards
     - ScopedTypeVariables
+    - MonoLocalBinds
 
 executables:
   pet-store-server:

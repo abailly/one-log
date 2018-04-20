@@ -17,16 +17,18 @@ import           Network.Wai.Handler.Warp                  (run)
 import           Network.Wai.Middleware.RequestLogger
 import           Network.Wai.Middleware.RequestLogger.JSON
 import           PetStore.Api
+import           PetStore.Config
 import           PetStore.Handler
+import           PetStore.Log
 import           PetStore.Store
 import           PetStore.Swagger
 import           Servant
 
-startServer :: ServerMode -> Int -> IO ()
-startServer devMode port = do
-  putStrLn $ "Starting PetStore Server: " <> show port
+startServer :: ServerConfig -> IO ()
+startServer conf@ServerConfig{..} = do
+  mlog $ "Starting PetStore Server: " <> show conf
   store <- makeStore
-  void $ run port $ doLog devMode $ server store devMode
+  void $ run listeningPort $ doLog operationMode $ server store operationMode
     where
       doLog Dev  = logStdoutDev
       doLog Prod = logStdout
