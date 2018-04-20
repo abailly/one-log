@@ -25,6 +25,7 @@ public class PaymentResource {
     @Consumes({MediaType.APPLICATION_JSON})
     @Timed
     public PaymentResult sayHello(Payment payment) {
-        return new PaymentResult(counter.incrementAndGet(), true);
+        return new PaymentResult(counter.incrementAndGet(),
+                                 payment.checkCardNumber());
     }
 }

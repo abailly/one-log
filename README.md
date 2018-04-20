@@ -1,7 +1,7 @@
 # TODO
 
 * [x] base client/server app with textual traces in Haskell
-* [ ] add another service in Java
+* [x] add another service in Java
 * [ ] structure logging in JSON
 * [ ] merge logs from 2 services by tailing containers
 * [ ] add opentracing IDs to logs
