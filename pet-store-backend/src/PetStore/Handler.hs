@@ -4,10 +4,9 @@
 {-# LANGUAGE TupleSections         #-}
 module PetStore.Handler where
 
-import           Control.Concurrent.MVar
 import           Control.Monad.Except
 import           Control.Monad.Reader
-import           Data.Monoid             ((<>))
+import           Data.Monoid          ((<>))
 import           PetStore.Log
 import           PetStore.Messages
 import           PetStore.Payment.Api

@@ -5,14 +5,11 @@
 
 module PetStore.Server where
 
---import           Control.Concurrent.MVar
 import           Control.Monad.Except
 import           Control.Monad.Reader
---import qualified Data.ByteString.Lazy     as LBS
-import           Data.Monoid                               ((<>))
---import           Data.Text
---import           Data.Text.Encoding       (encodeUtf8)
+import           Data.Aeson
 import           Data.Default
+import           Data.Monoid                               ((<>))
 import           Network.Wai.Handler.Warp                  (run)
 import           Network.Wai.Middleware.RequestLogger
 import           Network.Wai.Middleware.RequestLogger.JSON
@@ -27,13 +24,13 @@ import           Servant
 
 startServer :: ServerConfig -> IO ()
 startServer conf@ServerConfig{..} = do
-  mlog $ "Starting PetStore Server: " <> show conf
+  mlog $ object [ "action" .= ("start" :: String), "configuration" .= conf ]
   store <- makeStore
   paymentClient <- makeClient paymentHost paymentPort
-  void $ run listeningPort $ doLog operationMode $ server store operationMode paymentClient
+  logger <- doLog operationMode
+  void $ run listeningPort $ logger $ server store operationMode paymentClient
     where
-      doLog Dev  = logStdoutDev
-      doLog Prod = logStdout
+      doLog _ = mkRequestLogger $ def { outputFormat = CustomOutputFormatWithDetails formatAsJSON }
 
       runServer store = NT $ Handler . flip runReaderT store
 
