@@ -41,7 +41,7 @@ doBuild = do
 
 doRun :: IO ()
 doRun = do
-  j <- spawnProc "java" [ "-jar" , "./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar", "server" ] "."
+  j <- spawnProc "java" [ "-jar" , "./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar", "server", "payment-conf.yaml" ] "."
   h <- spawnProc "stack" [ "exec" ,"pet-store-server", "--", "Prod" , "9090", "localhost", "8080" ] "."
   void $ waitAnyCancel [ j, h]
 
