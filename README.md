@@ -9,6 +9,20 @@
 $ ./Build.hs build
 ```
 
+## Run
+
+To run all components on a Unixish system:
+
+```
+$ ./Build.hs run
+> java -jar ./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar server2> java-hU6VZy.err 1> java-JBUCKe.out
+> stack exec pet-store-server -- Prod 9090 localhost 80802> stack-37vm5O.err 1> stack-jQywpi.out
+^C
+```
+
+This spawns the PetStore and Payment processes, redirecting their stderr and stdout to the given files and waiting for
+either one to terminate. Typing `Ctrl + C` should stop both processes.
+
 
 # TODO
 
@@ -16,6 +30,7 @@ $ ./Build.hs build
 * [x] add another service in Java
 * [x] connect the 2 services
 * [x] build script
+* [x] run script
 * [ ] structure logging in JSON
 * [ ] merge logs from 2 services by tailing containers
 * [ ] add opentracing IDs to logs
