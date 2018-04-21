@@ -23,6 +23,15 @@ $ ./Build.hs run
 This spawns the PetStore and Payment processes, redirecting their stderr and stdout to the given files and waiting for
 either one to terminate. Typing `Ctrl + C` should stop both processes.
 
+## Test
+
+PetStore comes with a *driver* that uses a `Model` to generate tests representing user actions. This driver can be run
+against the server:
+
+```
+$ stack exec driver-petstore -- localhost 9090
++++ OK, passed 100 tests.
+```
 
 # TODO
 

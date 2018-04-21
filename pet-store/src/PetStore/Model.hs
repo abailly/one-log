@@ -113,6 +113,18 @@ petsNames = [ "Bailey", "Bella", "Max", "Lucy" ]
 users :: [ User ]
 users = [ User "alice", User "bob", User "charlie", User "damian", User "elisa" ]
 
+validCards :: [ Payment ]
+validCards =
+  fmap Payment [ "30595217443426"
+               ]
+
+invalidCards :: [ Payment ]
+invalidCards =
+  fmap Payment [ "402407118331601"
+               , "54331024966161"
+               , "5150875483748596"
+              ]
+
 instance Inputs PetStore Input where
   inputs (PetStore pets baskets) = fmap Add listOfPets
                                    <> fmap Remove pets
@@ -122,7 +134,11 @@ instance Inputs PetStore Input where
                                    <> fmap (UserLogout . fst) baskets
                                    <> fmap (uncurry AddToBasket) possibleAdds
                                    <> fmap (uncurry RemoveFromBasket) possibleRemoves
+                                   <> fmap (uncurry CheckoutBasket) validPayments
+                                   <> fmap (uncurry CheckoutBasket) invalidPayments
     where
+      validPayments   = [ (u, c) | u <- fmap fst baskets, c <- validCards ]
+      invalidPayments = [ (u, c) | u <- fmap fst baskets, c <- invalidCards ]
       possibleAdds    = [ (u, p) | u <- fmap fst baskets, p <- pets ]
       possibleRemoves = [ (u, p) | (u,ps) <- baskets, p <- ps ]
-      listOfPets = [ Pet name species price | name <- petsNames, species <- enumFrom Cat, price <- [ 10, 20, 30 ] ]
+      listOfPets      = [ Pet name species price | name <- petsNames, species <- enumFrom Cat, price <- [ 10, 20, 30 ] ]

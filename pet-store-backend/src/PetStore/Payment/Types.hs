@@ -5,26 +5,28 @@ module PetStore.Payment.Types where
 
 import           Control.Applicative ((<|>))
 import           Data.Aeson
-import           Data.Char           (digitToInt, isDigit)
+import           Data.Char           (digitToInt)
 import           GHC.Generics
 
 data Payment = Payment { cardNumber :: String }
              deriving (Eq,Show,Generic,ToJSON,FromJSON)
 
+
+
 checkCardNumber :: Payment -> Bool
 checkCardNumber Payment{cardNumber} =
-  computeLuhn (reverse cardNumber) 0
+  computeLuhn cardNumber
   where
-    computeLuhn (_:n:rest) k
-      | isDigit n = computeLuhn rest (k + reduce n)
-      | otherwise = False
-    computeLuhn _          k = k == 0
+    doubleAndSum :: [Int] -> Int
+    doubleAndSum = fst . foldr (\i (acc, isEven) -> (acc + nextStep isEven i, not isEven)) (0,False)
+      where
+        nextStep isEven i
+          | isEven      = (uncurry (+) . (`divMod` 10) . (*2)) i
+          | otherwise = i
 
-    reduce c =
-      let n = 2 * digitToInt c
-      in if n > 10
-         then (n - 10) + 1
-         else n
+    computeLuhn :: String -> Bool
+    computeLuhn = (0 ==) . (`mod` 10) . doubleAndSum . fmap digitToInt
+
 
 data PaymentResult = PaymentResult { _id     :: Integer
                                    , _result :: Bool
