@@ -15,13 +15,20 @@ To run all components on a Unixish system:
 
 ```
 $ ./Build.hs run
-> java -jar ./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar server2> java-hU6VZy.err 1> java-JBUCKe.out
-> stack exec pet-store-server -- Prod 9090 localhost 80802> stack-37vm5O.err 1> stack-jQywpi.out
+{"log":{"message":"starting java -jar ./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar server payment-conf.yaml"},"node":"driver"}
+{"log":{"message":"starting stack exec pet-store-server -- Dev 9090 localhost 8080"},"node":"driver"}
+# ... more logs
 ^C
 ```
 
-This spawns the PetStore and Payment processes, redirecting their stderr and stdout to the given files and waiting for
-either one to terminate. Typing `Ctrl + C` should stop both processes.
+This spawns the PetStore and Payment processes, wrapping their `stdout` and `stderr` into JSON-formatted log entries.
+Typing `Ctrl + C` should stop both processes.
+
+The format of the logs is simple:
+
+* `log`: The output from the process. If this output is already a JSON object, then this field contains an object, otherwise the output text
+  is wrapped into an object with field `message`
+* `node`: The name of the process from which this log entry comes from. The parent process is named `driver`
 
 ## Test
 
@@ -40,11 +47,11 @@ $ stack exec driver-petstore -- localhost 9090
 * [x] connect the 2 services
 * [x] build script
 * [x] run script
-* [ ] structure logging in JSON
-* [ ] merge logs from 2 services by tailing containers
-* [ ] add opentracing IDs to logs
+* [x] structure logging in JSON
+* [x] merge logs from 2 services by tailing containers
 * [ ] add system level logs
 * [ ] add network related logs
+* [ ] add opentracing IDs to logs
 * [ ] add docker logs
 * [ ] colorize logs according to source
 * [ ] store logs in kafka
