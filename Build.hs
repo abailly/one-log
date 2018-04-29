@@ -48,7 +48,17 @@ doRun = do
   t <- tailLogs q stdout
   j <- spawnProc q "java" [ "-jar" , "./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar", "server", "payment-conf.yaml" ] "."
   h <- spawnProc q "stack" [ "exec" ,"pet-store-server", "--", "Dev" , "9090", "localhost", "8080" ] "."
-  void $ waitAnyCancel ([ t ] <> j <>  h)
+  os <- spawnProc q "stack" [ "exec" ,"osquerys", "--", "osquery.conf", "test_server.pem" , "test_server.key", "8088" ] "."
+  oq <- spawnProc q "osqueryd" [ "--verbose",  "--ephemeral", "--disable_database", "--tls_hostname",  "localhost:8088"
+                               , "--tls_server_certs",  "test_server_ca.pem"
+                               , "--config_plugin", "tls"
+                               , "--config_tls_endpoint",  "/config"
+                               , "--logger_tls_endpoint", "/logger"
+                               , "--logger_plugin",  "tls"
+                               , "--enroll_tls_endpoint", "/enroll", "--enroll_secret_path", "secret.txt"
+                               ] "."
+
+  void $ waitAnyCancel ([ t ] <> j <> h <> os <> oq)
 
 
 runProc :: FilePath -> [ String ] -> FilePath -> IO ()

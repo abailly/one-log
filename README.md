@@ -40,6 +40,16 @@ $ stack exec driver-petstore -- localhost 9090
 +++ OK, passed 100 tests.
 ```
 
+## OSQuery
+
+The runner starts 2 system-level services to manage [osquery](https://github.com/facebook/osquery/) system-level logging and querying:
+
+* `osquerys` is a dead-simple Haskell server that will accept any `osqueryd` enrollment request, feed a configuration and dump the logged
+items into its `stdout`.
+* `osqueryd` is the osquery daemon itself that repeatedly issues requests depending on a configuration file.
+
+The file `osquery.conf` can be modified, it will be read by `osquerys` and used by `osqueryd`.
+
 # TODO
 
 * [x] base client/server app with textual traces in Haskell
@@ -49,7 +59,7 @@ $ stack exec driver-petstore -- localhost 9090
 * [x] run script
 * [x] structure logging in JSON
 * [x] merge logs from 2 services by tailing containers
-* [ ] add system level logs
+* [x] add system level logs
 * [ ] add network related logs
 * [ ] add opentracing IDs to logs
 * [ ] add docker logs

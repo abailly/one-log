@@ -6,6 +6,7 @@ packages:
     extra-dep: true
   - 'pet-store'
   - 'pet-store-backend'
+  - 'osquery-server'
 
 extra-deps:
   - unagi-chan-0.4.0.0

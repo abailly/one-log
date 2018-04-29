@@ -1,0 +1,61 @@
+name: osquery-server
+synopsis:  A simple centralised server for osquery logging and configuration
+ghc-options: -Wall -Werror -fno-warn-orphans
+
+
+library:
+  source-dirs: src
+  dependencies:
+    - aeson
+    - async
+    - base
+    - bytestring
+    - containers
+    - data-default
+    - http-api-data
+    - http-client
+    - lens
+    - mtl
+    - network
+    - random
+    - servant
+    - servant-server
+    - text
+    - time
+    - wai-extra
+    - warp
+    - warp-tls
+  exposed-modules:
+    - Net.OsQuery.Server
+  default-extensions:
+    - OverloadedStrings
+    - RecordWildCards
+    - ScopedTypeVariables
+    - MonoLocalBinds
+
+executables:
+  osquerys:
+    source-dirs:
+      - server
+    main: server.hs
+    dependencies:
+      - aeson
+      - async
+      - base
+      - bytestring
+      - containers
+      - http-client
+      - http-types
+      - mtl
+      - network
+      - osquery-server
+      - random
+      - servant
+      - servant-client
+      - servant-server
+      - stm
+      - text
+      - unagi-chan
+      - wai
+      - wai-middleware-static
+      - warp
