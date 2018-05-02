@@ -47,10 +47,11 @@ doRun :: IO ()
 doRun = do
   q  <- newChan
   t  <- tailLogs q stdout
-  j  <- spawnProc q "java" [ "-jar" , "./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar", "server", "payment-conf.yaml" ] "."
-  h  <- spawnProc q "pet-store-server" [ "Dev" , "9090", "localhost", "8080" ] "."
-  os <- spawnProc q "osquerys" [ "osquery.conf", "test_server.pem" , "test_server.key", "8088" ] "."
-  oq <- spawnProc q "osqueryd" [ "--verbose",  "--ephemeral", "--disable_database", "--tls_hostname",  "localhost:8088"
+  let [ c1, c2, c3, c4 ] = take 4 $ genColors
+  j  <- spawnProc c1 q "java" [ "-jar" , "./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar", "server", "payment-conf.yaml" ] "."
+  h  <- spawnProc c2 q "pet-store-server" [ "Dev" , "9090", "localhost", "8080" ] "."
+  os <- spawnProc c3 q "osquerys" [ "osquery.conf", "test_server.pem" , "test_server.key", "8088" ] "."
+  oq <- spawnProc c4 q "osqueryd" [ "--verbose",  "--ephemeral", "--disable_database", "--tls_hostname",  "localhost:8088"
                                , "--tls_server_certs",  "test_server_ca.pem"
                                , "--config_plugin", "tls"
                                , "--config_tls_endpoint",  "/config"
@@ -71,11 +72,9 @@ runProc fp arg dir = do
     e@(ExitFailure _) -> exitWith e
 
 
-spawnProc :: LogQueue -> FilePath -> [ String ] -> FilePath -> IO [ Async () ]
-spawnProc queue fp arg dir = do
+spawnProc :: Color -> LogQueue -> FilePath -> [ String ] -> FilePath -> IO [ Async () ]
+spawnProc col queue fp arg dir = do
   let name = Text.pack fp
-
-      col = Color 10 210 50
 
       readOutput :: Handle -> IO (Async ())
       readOutput hd = async $
