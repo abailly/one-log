@@ -115,8 +115,7 @@ users = [ User "alice", User "bob", User "charlie", User "damian", User "elisa" 
 
 validCards :: [ Payment ]
 validCards =
-  fmap Payment [ "30595217443426"
-               ]
+  fmap Payment [ "30595217443426" ]
 
 invalidCards :: [ Payment ]
 invalidCards =

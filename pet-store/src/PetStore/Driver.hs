@@ -7,16 +7,16 @@
 
 module PetStore.Driver where
 
-
-import           Control.Arrow           (first)
+import           Control.Arrow            (first)
+import           Control.Concurrent.Async
 import           Control.Monad.Reader
-import           Data.Monoid             ((<>))
+import           Data.Monoid              ((<>))
 import           IOAutomaton
 import           Network.HTTP.Client
 import           PetStore.Api
 import           PetStore.Messages
 import           PetStore.Model
-import           Prelude                 hiding (init)
+import           Prelude                  hiding (init)
 import           Servant
 import           Servant.Client
 import           Test.QuickCheck
@@ -59,8 +59,8 @@ eitherToMaybe :: Either e a -> Maybe a
 eitherToMaybe (Right a) = Just a
 eitherToMaybe (Left _)  = Nothing
 
-runTestDriver :: String -> Int -> IO ()
-runTestDriver serverHost serverPort = do
+runTestDriver :: Int -> String -> Int -> IO ()
+runTestDriver numThreads serverHost serverPort = replicateConcurrently_ numThreads $ do
   quickCheck $ monadicIO $
     forAllM (arbitrary :: Gen (Valid PetStore PetStoreState Input Output))  $ \ (validTransitions -> trace) -> do
     b' <- run $ do
@@ -68,7 +68,7 @@ runTestDriver serverHost serverPort = do
       let url = BaseUrl Http serverHost serverPort ""
           env = ClientEnv mgr url
 
-      flip runReaderT env $ testSUT (init :: PetStore) (T trace)
+      (`runReaderT` env) $ testSUT (init :: PetStore) (T trace)
 
     monitor (counterexample $ "run not successful " <> show b')
     assert (isSuccessful b')

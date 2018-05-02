@@ -1,12 +1,9 @@
-{-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TupleSections         #-}
-{-# LANGUAGE TypeOperators         #-}
+{-# LANGUAGE ViewPatterns #-}
 
 import           PetStore.Driver
 import           System.Environment
 
 main :: IO ()
 main = do
-  [serverHost, serverPort] <- getArgs -- to connect to server
-  runTestDriver serverHost (read serverPort)
+  [read -> numThreads, serverHost, serverPort] <- getArgs -- to connect to server
+  runTestDriver numThreads serverHost (read serverPort)
