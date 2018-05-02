@@ -23,3 +23,7 @@ node-modules/
 TAGS
 target/
 store.db
+.settings/
+*.cabal
+*.classpath
+*.project
