@@ -61,7 +61,7 @@ doRun = do
                                ],  ".")
               ]
 
-  ps <- concat <$> mapM (\ ((name, args, dir), color) -> spawnProc color q name args dir) (zip procs genColors)
+  ps <- concat <$> mapM (\ ((name, args, dir), clr) -> spawnProc clr q name args dir) (zip procs genColors)
 
   void $ waitAnyCancel (t:ps)
 
