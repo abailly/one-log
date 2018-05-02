@@ -50,24 +50,70 @@ items into its `stdout`.
 
 The file `osquery.conf` can be modified, it will be read by `osquerys` and used by `osqueryd`.
 
-# TODO
+# Agenda
 
+## Producing Logs
+
+* Have a single logs firehose
+* Logs are "machine-readable" first
+* Show activity of services through logs
+
+### Base logging of 2 services
+
+* [ ] colorised code by service
 * [x] base client/server app with textual traces in Haskell
 * [x] add another service in Java
 * [x] connect the 2 services
 * [x] build script
 * [x] run script
+
+### Structure logging
+
 * [x] structure logging in JSON
+* [ ] adding structured logs for payment
+* [ ] tactics for retrofitting "traditional" logs into structured logs
+
+### Aggregate "All" Logs
+
 * [x] merge logs from 2 services by tailing containers
-* [x] add system level logs
+* [x] add system level logs (osquery)
+* [ ] add unix timestamp to aggregated logs
+* [ ] set node id to be more precise
+* [ ] dockerize all containers
+* [ ] refine osquery queries to provide high-level system information
 * [ ] add network related logs
-* [ ] add opentracing IDs to logs
 * [ ] add docker logs
-* [ ] colorize logs according to source
-* [ ] store logs in kafka
-* [ ] apply rational transducer one logs to produce per-connection analysis
+* [x] make driver multithreaded
+* [ ] petstore model should handle concurrent clients
+* [ ] multitail
+
+## Consuming Logs
+
+* Using the produced logs for fun and profit
+
+### Cross-Layer Analysis
+
+* [ ] add jaeger server
+* [ ] pass tracing ids around services
+* [ ] use logs to delineate spans inside service
+* [ ] incident analysis: correlate 1 syst evt with several exceptions
 * [ ] flamegraph
+
+### Storage
+
+* [ ] store logs in kafka??
+* [ ] feed to a file and applky simple jq filtering
+
+### Reconstruct/Patterns
+
+* [ ] build a xducer to extract timing information from petstore
+* [ ] apply rational transducer one logs to produce per-connection analysis
 * [ ] reinject logs into application for replay
+
+## Future Works
+
+* [ ] infer xducer/language from past logs
+* [ ] RNN for inferinng sequences
 
 # Plan
 
