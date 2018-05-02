@@ -103,6 +103,9 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
   * kill a service, event notified in docker events, correlate with incident on API
 * [ ] flamegraph
 
+### Different Views
+* [ ] [Y] Extract Metrics and view in Grafana
+
 ### Storage
 
 * [ ] ~~store logs in kafka??~~
@@ -121,6 +124,7 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
 
 * [ ] infer xducer/language from past logs
 * [ ] RNN for infering sequences
+* [ ] Is there a way to make Kibana useful?
 
 ## Conclusion
 
