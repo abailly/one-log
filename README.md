@@ -60,33 +60,35 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
 
 ### Base logging of 2 services
 
-* [ ] colorised code by service
+* [x] colorised code by service
 * [x] base client/server app with textual traces in Haskell
 * [x] add another service in Java
 * [x] connect the 2 services
 * [x] build script
 * [x] run script
-* [ ] fix newlines in stack traces from Java
+* [ ] [Y] fix newlines in stack traces from Java
 
 ### Structure logging
 
 * [x] structure logging in JSON
-* [ ] adding structured logs for payment
-* [ ] tactics for retrofitting "traditional" logs into structured logs
+* [ ] [A] adding structured logs for payment
+* [ ] [Y] tactics for retrofitting "traditional" logs into structured logs
 
 ### Aggregate "All" Logs
 
+* From multitail to unilog
+
 * [x] merge logs from 2 services by tailing containers
 * [x] add system level logs (osquery)
-* [ ] add unix timestamp to aggregated logs
-* [ ] set node id to be more precise
-* [ ] dockerize all containers
-* [ ] refine osquery queries to provide high-level system information
+* [ ] [A] add unix timestamp to aggregated logs
+* [x] set node id to be more precise
+* [ ] [A] dockerize all containers
+* [ ] [Y] refine osquery queries to provide high-level system information
 * [x] ~~add network related logs~~
-* [ ] add docker logs
+* [ ] [Y] add fswatch
+* [ ] [A] add docker logs
 * [x] make driver multithreaded
-* [ ] petstore model should handle concurrent clients
-* [ ] multitail
+* [ ] ~~petstore model should handle concurrent clients~~
 
 ## Consuming Logs
 
@@ -94,29 +96,35 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
 
 ### Cross-Layer Analysis
 
-* [ ] add jaeger server
-* [ ] pass tracing ids around services
+* [ ] [A] add jaeger server
+* [ ] [A/Y] pass tracing ids around services
 * [ ] use logs to delineate spans inside service
-* [ ] incident analysis: correlate 1 syst evt with several exceptions
+* [ ] incident analysis: correlate 1 syst evt with several exceptions?
+  * kill a service, event notified in docker events, correlate with incident on API
 * [ ] flamegraph
 
 ### Storage
 
-* [ ] store logs in kafka??
+* [ ] ~~store logs in kafka??~~
 * [ ] feed to a file and applky simple jq filtering
 
 ### Reconstruct/Patterns
 
-* [ ] build a xducer to extract timing information from petstore
+* [ ] [A] build a xducer to extract timing information from petstore
 * [ ] apply rational transducer one logs to produce per-connection analysis
 * [ ] reinject logs into application for replay
-* [ ] infer bigrams distribution from logs -> compare
-* [ ] infer sequences from LSTM
+* [ ] [Y] infer bigrams distribution from logs -> compare
+* [ ] [Y] infer sequences from LSTM
+  * can we find again the hand-coded xducer from the inferred grammar?
 
 ## Future Works
 
 * [ ] infer xducer/language from past logs
 * [ ] RNN for infering sequences
+
+## Conclusion
+
+* Logs are the semantics of the system
 
 # Plan
 
