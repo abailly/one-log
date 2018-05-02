@@ -98,7 +98,6 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
 
 * [ ] [A] add jaeger server
 * [ ] [A/Y] pass tracing ids around services
-* [ ] use logs to delineate spans inside service
 * [ ] incident analysis: correlate 1 syst evt with several exceptions?
   * kill a service, event notified in docker events, correlate with incident on API
 * [ ] flamegraph
@@ -114,7 +113,8 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
 ### Reconstruct/Patterns
 
 * [ ] [A] build a xducer to extract timing information from petstore
-* [ ] apply rational transducer one logs to produce per-connection analysis
+  * [ ] use logs to delineate spans inside service
+  * [ ] apply rational transducer one logs to produce per-connection analysis
 * [ ] reinject logs into application for replay
 * [ ] [Y] infer bigrams distribution from logs -> compare
 * [ ] [Y] infer sequences from LSTM
