@@ -1,10 +1,9 @@
 server:
   requestLog:
-  appenders:
-    - type: console
-      layout:
-        type: access-json
-
+    appenders:
+      - type: console
+        layout:
+          type: access-json
 logging:
   level: INFO
   appenders:
