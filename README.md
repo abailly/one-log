@@ -66,6 +66,7 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
 * [x] connect the 2 services
 * [x] build script
 * [x] run script
+* [ ] fix newlines in stack traces from Java
 
 ### Structure logging
 
@@ -81,7 +82,7 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
 * [ ] set node id to be more precise
 * [ ] dockerize all containers
 * [ ] refine osquery queries to provide high-level system information
-* [ ] add network related logs
+* [x] ~~add network related logs~~
 * [ ] add docker logs
 * [x] make driver multithreaded
 * [ ] petstore model should handle concurrent clients
@@ -109,11 +110,13 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
 * [ ] build a xducer to extract timing information from petstore
 * [ ] apply rational transducer one logs to produce per-connection analysis
 * [ ] reinject logs into application for replay
+* [ ] infer bigrams distribution from logs -> compare
+* [ ] infer sequences from LSTM
 
 ## Future Works
 
 * [ ] infer xducer/language from past logs
-* [ ] RNN for inferinng sequences
+* [ ] RNN for infering sequences
 
 # Plan
 

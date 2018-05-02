@@ -9,6 +9,7 @@ A simple script to build and run all components of the ''One Log'' talk
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# OPTIONS_GHC -Wall -Werror #-}
 
+import           Color
 import           Control.Concurrent.Async
 import           Control.Concurrent.Chan
 import           Control.Exception        (IOException, catch, finally, throw,
@@ -44,11 +45,11 @@ doBuild = do
 
 doRun :: IO ()
 doRun = do
-  q <- newChan
-  t <- tailLogs q stdout
-  j <- spawnProc q "java" [ "-jar" , "./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar", "server", "payment-conf.yaml" ] "."
-  h <- spawnProc q "stack" [ "exec" ,"pet-store-server", "--", "Dev" , "9090", "localhost", "8080" ] "."
-  os <- spawnProc q "stack" [ "exec" ,"osquerys", "--", "osquery.conf", "test_server.pem" , "test_server.key", "8088" ] "."
+  q  <- newChan
+  t  <- tailLogs q stdout
+  j  <- spawnProc q "java" [ "-jar" , "./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar", "server", "payment-conf.yaml" ] "."
+  h  <- spawnProc q "pet-store-server" [ "Dev" , "9090", "localhost", "8080" ] "."
+  os <- spawnProc q "osquerys" [ "osquery.conf", "test_server.pem" , "test_server.key", "8088" ] "."
   oq <- spawnProc q "osqueryd" [ "--verbose",  "--ephemeral", "--disable_database", "--tls_hostname",  "localhost:8088"
                                , "--tls_server_certs",  "test_server_ca.pem"
                                , "--config_plugin", "tls"
@@ -73,15 +74,18 @@ runProc fp arg dir = do
 spawnProc :: LogQueue -> FilePath -> [ String ] -> FilePath -> IO [ Async () ]
 spawnProc queue fp arg dir = do
   let name = Text.pack fp
+
+      col = Color 10 210 50
+
       readOutput :: Handle -> IO (Async ())
       readOutput hd = async $
         forever ((do
                     l <- LBS.fromStrict <$> BS8.hGetLine hd
-                    writeChan queue (logEntry name l))
+                    writeChan queue (logEntry name col l))
                  `catch` (\ e  ->
                              if isEOFError e
                              then throw e
-                             else writeChan queue (logEntry name $
+                             else writeChan queue (logEntry name col $
                                                    encode $
                                                    object [ "process" .=  name
                                                           , "error" .= show e ])))
@@ -92,7 +96,7 @@ spawnProc queue fp arg dir = do
     Right (_, Just aout, Just aerr, aProc) -> do
       outtid <- readOutput aout
       errtid <- readOutput aerr
-      writeChan queue $ logEntry "driver" (encode $ object [ "message" .= Text.pack ("starting " <> fp <> " " <> unwords arg) ])
+      writeChan queue $ logEntry "driver" (Color 200 10 10) (encode $ object [ "message" .= Text.pack ("starting " <> fp <> " " <> unwords arg) ])
 
       p <- async $ void (waitForProcess aProc) `finally` terminateProcess aProc
       return $ [p, outtid, errtid]

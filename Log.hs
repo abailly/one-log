@@ -4,6 +4,7 @@
 
 module Log where
 
+import           Color
 import           Control.Concurrent.Async
 import           Control.Concurrent.Chan
 import           Data.Aeson
@@ -15,7 +16,6 @@ import           Data.Text.Lazy.Encoding
 import qualified Data.Text.Lazy.IO        as TextIO
 import           System.IO
 
-
 -- |Entries that can be fed to a `LogQueue`
 data LogEntry = LogEntry Message
               -- ^A log message originating from some service
@@ -23,10 +23,11 @@ data LogEntry = LogEntry Message
               -- ^A /Poison Pill/  to stop the logging thread
   deriving (Eq, Show)
 
-logEntry :: Text.Text -> LBS.ByteString -> LogEntry
-logEntry o c = LogEntry $ Message o c
+logEntry :: Text.Text -> Color -> LBS.ByteString -> LogEntry
+logEntry o col c = LogEntry $ Message o col c
 
 data Message = Message { origin :: Text.Text
+                       , color  :: Color
                        , msg    :: LBS.ByteString
                        }
              deriving (Eq, Show)
@@ -54,7 +55,7 @@ tailLogs logSource logSink = do
                         (\ m ->  object ["node" .= origin out, "log" .= m ])
                         jsonMsg
 
-              msgString = jsonToText fullMsg
+              msgString = colorise (color out) $ jsonToText fullMsg
             TextIO.hPutStrLn logSink msgString
             doLog
 
