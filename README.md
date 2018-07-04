@@ -84,7 +84,6 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
 * [x] set node id to be more precise
 * [ ] [A] dockerize all containers
 * [ ] [Y] refine osquery queries to provide high-level system information
-* [x] ~~add network related logs~~
 * [ ] [Y] add fswatch
 * [ ] [A] add docker logs
 * [x] make driver multithreaded
@@ -112,6 +111,9 @@ The file `osquery.conf` can be modified, it will be read by `osquerys` and used 
 
 ### Reconstruct/Patterns
 
+* Biblio
+  * [X] Contact François Denis
+  * [ ] Reconstructing grammar from samples
 * [ ] [A] build a xducer to extract timing information from petstore
   * [ ] use logs to delineate spans inside service
   * [ ] apply rational transducer one logs to produce per-connection analysis
