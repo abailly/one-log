@@ -11,7 +11,6 @@ import           Control.Monad.Trans         (liftIO)
 import           Data.Aeson
 import qualified Data.ByteString.Lazy.Char8  as LBS
 import           Data.Maybe
-import           Data.Monoid
 import           Data.Text                   (Text)
 import           GHC.Generics
 import           Net.OsQuery.Api

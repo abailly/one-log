@@ -18,7 +18,6 @@ import           Control.Monad            (forever, void)
 import           Data.Aeson
 import qualified Data.ByteString.Char8    as BS8
 import qualified Data.ByteString.Lazy     as LBS
-import           Data.Monoid
 import qualified Data.Text.Lazy           as Text
 import           Log
 import           System.Environment       (getArgs)

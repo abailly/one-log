@@ -9,12 +9,9 @@ module PetStore.Swagger(petStoreSwagger) where
 
 import           Control.Lens
 import           Data.Aeson
-import           Data.Maybe
 import           Data.Swagger
-import           GHC.Generics
 import           PetStore.Api
 import           PetStore.Messages
-import           Servant
 import           Servant.Swagger
 
 instance ToSchema Output

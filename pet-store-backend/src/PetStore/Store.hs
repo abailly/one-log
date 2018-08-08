@@ -17,7 +17,6 @@ import qualified Data.List               as List
 import           Data.Map                (member)
 import qualified Data.Map                as Map
 import           Data.Maybe
-import           Data.Monoid
 import           Data.Text.Lazy.Encoding (decodeUtf8, encodeUtf8)
 import           Data.Text.Lazy.IO       (hGetLine, hPutStrLn)
 import           PetStore.Log

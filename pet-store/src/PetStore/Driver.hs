@@ -66,7 +66,7 @@ runTestDriver numThreads serverHost serverPort = replicateConcurrently_ numThrea
     b' <- run $ do
       mgr <- newManager defaultManagerSettings
       let url = BaseUrl Http serverHost serverPort ""
-          env = ClientEnv mgr url
+          env = ClientEnv mgr url Nothing
 
       (`runReaderT` env) $ testSUT (init :: PetStore) (T trace)
 

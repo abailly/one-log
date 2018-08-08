@@ -23,5 +23,5 @@ type PaymentClient = Payment -> IO PaymentResult
 makeClient :: String -> Int -> IO PaymentClient
 makeClient h p = do
   let baseUrl = BaseUrl Http h p ""
-  env <- ClientEnv <$> newManager defaultManagerSettings <*> pure baseUrl
+  env <- ClientEnv <$> newManager defaultManagerSettings <*> pure baseUrl <*> pure Nothing
   pure $ \ pay -> either (PaymentError . show) id <$> runClientM (checkPayment pay) env

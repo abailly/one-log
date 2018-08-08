@@ -32,10 +32,10 @@ startServer conf@ServerConfig{..} = do
     where
       doLog _ = mkRequestLogger $ def { outputFormat = CustomOutputFormatWithDetails formatAsJSON }
 
-      runServer store = NT $ Handler . flip runReaderT store
+      runServer store = Handler . flip runReaderT store
 
-      server store Prod paymentClient = serve petStoreApi $ enter (runServer store) (prodHandler paymentClient)
-      server store Dev  paymentClient = serve devPetStoreApi $ enter (runServer store) (devHandler paymentClient)
+      server store Prod paymentClient = serve petStoreApi $ hoistServer petStoreApi (runServer store) (prodHandler paymentClient)
+      server store Dev  paymentClient = serve devPetStoreApi $ hoistServer devPetStoreApi (runServer store) (devHandler paymentClient)
 
       prodHandler paymentClient = listPets :<|> addPet :<|> removePet :<|> login :<|> logout :<|> addToBasket :<|> removeFromBasket :<|> checkout paymentClient :<|> listBasket
       devHandler  paymentClient = prodHandler paymentClient :<|> reset :<|> pure petStoreSwagger
