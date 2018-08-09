@@ -49,6 +49,7 @@ executables:
       - ioautomata
       - mtl
       - network
+      - optparse-generic
       - QuickCheck
       - random
       - servant
