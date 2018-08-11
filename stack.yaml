@@ -7,7 +7,7 @@ packages:
   - 'pet-store'
   - 'pet-store-backend'
   - 'osquery-server'
-
+  - 'one-log'
 extra-deps:
   - unagi-chan-0.4.0.0
   - MonadPrompt-1.0.0.5

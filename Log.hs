@@ -42,6 +42,7 @@ tailLogs :: LogQueue
          -> IO (Async ())
 
 tailLogs logSource logSink = do
+  tty <- hIsTerminalDevice logSink
   let doLog = do
         entry <- readChan logSource
         case entry of
@@ -55,7 +56,8 @@ tailLogs logSource logSink = do
                         (\ m ->  object ["node" .= origin out, "log" .= m ])
                         jsonMsg
 
-              msgString = colorise (color out) $ jsonToText fullMsg
+              addColors = if tty then colorise (color out) else id
+              msgString = addColors $ jsonToText fullMsg
             TextIO.hPutStrLn logSink msgString
             doLog
 
