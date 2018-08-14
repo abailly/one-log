@@ -29,9 +29,6 @@ collect = do
   yield c
   collect
 
-printText :: (MonadIO m) => Proxy () Text y' y m b
-printText = forever $ await >>= liftIO . print
-
 --tag :: (Applicative f) => (Text -> f Text) -> Value -> f Value
 tag  :: Traversal' Value Text
 tag = key "log".key "message".key "tag"._String

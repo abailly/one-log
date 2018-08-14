@@ -1,6 +1,7 @@
-{-# LANGUAGE ExplicitForAll #-}
-{-# LANGUAGE GADTs          #-}
-{-# LANGUAGE RankNTypes     #-}
+{-# LANGUAGE ExplicitForAll    #-}
+{-# LANGUAGE GADTs             #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes        #-}
 
 {-| Take as input a sequence of JSON values and "morph" them
 into a simpler representation.
@@ -13,15 +14,14 @@ module OneLog.Morphism where
 
 import           Control.Category
 import           Control.Lens
-import           Control.Monad        (forM_)
+import           Control.Monad        (forM_, forever)
 import           Data.Aeson
 import           Data.Aeson.Lens
 import qualified Data.ByteString      as BS
 import qualified Data.ByteString.Lazy as LBS
-import           Data.Proxy
 import           Data.String
 import           Data.Text            (Text, pack)
-import           Pipes                hiding (Proxy)
+import           Pipes
 import qualified Pipes.ByteString     as P
 import           Prelude              hiding (id, (.))
 import           System.IO
@@ -46,6 +46,12 @@ instance Category Morphism where
 -- mkLens (Tag s)      = ix s
 -- mkLens (Comp  m m') = mkLens m . mkLens m'
 
+parseOptics :: String -> Morphism a b
+parseOptics = undefined
+
+fromMorphism :: Morphism a b -> Traversal' a b
+fromMorphism = undefined
+
 applyMorphism :: (MonadIO m, Show a, Monoid a) => Traversal' Value a -> Pipe Value a m r
 applyMorphism morph = do
   v <- await
@@ -66,3 +72,7 @@ decodeText hdl = P.hGetSome 1024 hdl >-> chunker mempty >-> decoder
       case eitherDecode (LBS.fromStrict bs) of
         Right v -> yield v >> decoder
         Left _  -> decoder
+
+
+printText :: (MonadIO m) => Proxy () Text y' y m b
+printText = forever $ await >>= liftIO . print
