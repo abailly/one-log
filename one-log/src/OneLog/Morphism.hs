@@ -13,14 +13,16 @@ JSON values representing a stream of logs, in order to produce different
 module OneLog.Morphism where
 
 import           Control.Category
+import           Control.Exception    (IOException, try)
 import           Control.Lens
-import           Control.Monad        (forM_, forever)
+import           Control.Monad        (forM_, forever, unless)
 import           Data.Aeson
 import           Data.Aeson.Lens
 import qualified Data.ByteString      as BS
 import qualified Data.ByteString.Lazy as LBS
 import           Data.String
 import           Data.Text            (Text, pack)
+import qualified Data.Text.IO         as Text
 import           Pipes
 import qualified Pipes.ByteString     as P
 import           Prelude              hiding (id, (.))
@@ -59,20 +61,29 @@ applyMorphism morph = do
   applyMorphism morph
 
 decodeText :: (MonadIO m) => Handle -> Producer Value m ()
-decodeText hdl = P.hGetSome 1024 hdl >-> chunker mempty >-> decoder
+decodeText hdl = pump >-> chunker mempty >-> decoder
   where
+    pump = P.hGetSome 1024 hdl
+
     chunker acc = do
       bs <- await
-      case BS.break (== fromIntegral (fromEnum '\n')) bs of
-        (hd,"") -> chunker (acc <> hd)
-        (hd,tl) -> yield (acc <> hd) >> chunker (BS.drop 1 tl)
+      rest <- yieldChunks (acc <> bs)
+      chunker rest
+
+    yieldChunks bs = do
+      case BS.break (== 0xa) bs of
+        (hd,"") -> pure hd
+        (hd,tl) -> yield hd >> yieldChunks (BS.drop 1 tl)
 
     decoder = do
       bs <- await
       case eitherDecode (LBS.fromStrict bs) of
         Right v -> yield v >> decoder
-        Left _  -> decoder
+        Left e  -> liftIO (print e) >> decoder
 
 
 printText :: (MonadIO m) => Proxy () Text y' y m b
-printText = forever $ await >>= liftIO . print
+printText = do
+  c <- await
+  unless (c == "") $ liftIO $ Text.putStrLn c
+  printText
