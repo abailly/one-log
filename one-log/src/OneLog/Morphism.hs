@@ -36,6 +36,7 @@ import           Text.Parsec
 data Morphism where
   Id :: Morphism
   Tag :: Text -> Morphism
+  Comp :: Morphism -> Morphism -> Morphism
 
 deriving instance Show Morphism
 deriving instance Eq Morphism
@@ -43,23 +44,23 @@ deriving instance Eq Morphism
 instance IsString Morphism where
   fromString = Tag . pack
 
--- mkLens :: (Applicative f) => Morphism Value Value -> Lens'' f Value Value Value Value
--- mkLens Id           = id
--- mkLens (Tag s)      = ix s
--- mkLens (Comp  m m') = mkLens m . mkLens m'
-
 parseMorphism :: String -> Morphism
 parseMorphism s =
-  case runParser parseTag () "" s of
+  case runParser parser () "" s of
     Right m -> m
     Left e  -> error (show e)
   where
+    parser = foldl1 Comp <$> parseTag `sepBy1` parseDot
+
     parseTag :: Parsec String () Morphism
     parseTag = Tag . pack <$> many1 alphaNum
 
+    parseDot = spaces >> char '.' >> spaces
+
 fromMorphism :: Morphism -> Traversal' Value Value
-fromMorphism (Tag s) = key s
-fromMorphism Id      = id
+fromMorphism (Tag s)     = key s
+fromMorphism (Comp m m') = fromMorphism m . fromMorphism m'
+fromMorphism Id          = id
 
 applyMorphism :: (MonadIO m) => Traversal' Value a -> Pipe Value [a] m r
 applyMorphism morph = do

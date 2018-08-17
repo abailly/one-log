@@ -43,6 +43,8 @@ spec = describe "Basic Morphisms" $ do
   describe "Traversal Parser" $ do
     it "parses tag" $ do
       parseMorphism "log" `shouldBe` Tag "log"
+    it "parses tag composition" $ do
+      parseMorphism "log.message" `shouldBe` Comp (Tag "log") (Tag "message")
 
   describe "Morphism application" $ do
     it "extracts tag" $ do
