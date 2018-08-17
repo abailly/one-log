@@ -3,7 +3,7 @@
 module OneLog.MorphismSpec where
 
 import           Control.Category
-import           Control.Lens
+import           Control.Lens               hiding ((.=))
 import           Control.Monad.State
 import           Prelude                    hiding ((.))
 --import           Data.Aeson
@@ -22,11 +22,10 @@ import           Test.Hspec
 sampleLog :: FilePath
 sampleLog = $(LitE . StringL <$> makeRelativeToProject "logs")
 
-collect :: (Monad m) => Pipe Text Text (StateT Int m) ()
+collect :: (Monad m) => Consumer Text (StateT Int m) ()
 collect = do
-  c <- await
+  _ <- await
   modify (+1)
-  yield c
   collect
 
 --tag :: (Applicative f) => (Text -> f Text) -> Value -> f Value
@@ -37,6 +36,15 @@ spec :: Spec
 spec = describe "Basic Morphisms" $ do
 
   around (withFile sampleLog ReadMode) $ it "stream simple log extracting tag" $ \ hdl -> do
-    output <- flip execStateT 0 $ runEffect $ decodeText hdl >-> applyMorphism tag >-> collect >-> printText
+    output <- flip execStateT 0 $ runEffect $ decodeText hdl >-> applyMorphism tag >-> collect
 
     output `shouldBe` 15321
+
+  describe "Traversal Parser" $ do
+    it "parses tag" $ do
+      parseMorphism "log" `shouldBe` Tag "log"
+
+  describe "Morphism application" $ do
+    it "extracts tag" $ do
+      object [ "log" .= ("bar" :: String) ] ^.. fromMorphism (Tag "log")
+        `shouldBe` [String "bar"]

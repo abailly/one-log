@@ -1,7 +1,8 @@
-{-# LANGUAGE ExplicitForAll    #-}
-{-# LANGUAGE GADTs             #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RankNTypes        #-}
+{-# LANGUAGE ExplicitForAll     #-}
+{-# LANGUAGE GADTs              #-}
+{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE RankNTypes         #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 {-| Take as input a sequence of JSON values and "morph" them
 into a simpler representation.
@@ -27,32 +28,38 @@ import           Pipes
 import qualified Pipes.ByteString     as P
 import           Prelude              hiding (id, (.))
 import           System.IO
+import           Text.Parsec
 
 -- http://hackage.haskell.org/package/lens-4.17/docs/Control-Lens-Type.html#t:Lens
 -- type Lens'' f s t a b = (a -> f b) -> s -> f t
 
-data Morphism a b where
-  Id :: Morphism a a
-  Tag :: Text -> Morphism a b
-  Comp :: Morphism b c -> Morphism a b -> Morphism a c
+data Morphism where
+  Id :: Morphism
+  Tag :: Text -> Morphism
 
-instance IsString (Morphism a b) where
+deriving instance Show Morphism
+deriving instance Eq Morphism
+
+instance IsString Morphism where
   fromString = Tag . pack
-
-instance Category Morphism where
-  id = Id
-  (.) = Comp
 
 -- mkLens :: (Applicative f) => Morphism Value Value -> Lens'' f Value Value Value Value
 -- mkLens Id           = id
 -- mkLens (Tag s)      = ix s
 -- mkLens (Comp  m m') = mkLens m . mkLens m'
 
-parseOptics :: String -> Morphism a b
-parseOptics = undefined
+parseMorphism :: String -> Morphism
+parseMorphism s =
+  case runParser parseTag () "" s of
+    Right m -> m
+    Left e  -> error (show e)
+  where
+    parseTag :: Parsec String () Morphism
+    parseTag = Tag . pack <$> many1 alphaNum
 
-fromMorphism :: Morphism a b -> Traversal' a b
-fromMorphism = undefined
+fromMorphism :: Morphism -> Traversal' Value Value
+fromMorphism (Tag s) = key s
+fromMorphism Id      = id
 
 applyMorphism :: (MonadIO m, Show a, Monoid a) => Traversal' Value a -> Pipe Value a m r
 applyMorphism morph = do

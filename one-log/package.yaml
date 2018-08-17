@@ -27,6 +27,7 @@ dependencies:
 - lens-aeson
 - mtl
 - optparse-generic
+- parsec
 - pipes
 - pipes-bytestring
 - template-haskell
