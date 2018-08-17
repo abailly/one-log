@@ -22,10 +22,10 @@ import           Test.Hspec
 sampleLog :: FilePath
 sampleLog = $(LitE . StringL <$> makeRelativeToProject "logs")
 
-collect :: (Monad m) => Consumer Text (StateT Int m) ()
+collect :: (Monad m) => Consumer [Text] (StateT Int m) ()
 collect = do
-  _ <- await
-  modify (+1)
+  t <- await
+  modify (+ length t)
   collect
 
 --tag :: (Applicative f) => (Text -> f Text) -> Value -> f Value
@@ -38,7 +38,7 @@ spec = describe "Basic Morphisms" $ do
   around (withFile sampleLog ReadMode) $ it "stream simple log extracting tag" $ \ hdl -> do
     output <- flip execStateT 0 $ runEffect $ decodeText hdl >-> applyMorphism tag >-> collect
 
-    output `shouldBe` 15321
+    output `shouldBe` 9382
 
   describe "Traversal Parser" $ do
     it "parses tag" $ do

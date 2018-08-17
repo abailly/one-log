@@ -61,10 +61,10 @@ fromMorphism :: Morphism -> Traversal' Value Value
 fromMorphism (Tag s) = key s
 fromMorphism Id      = id
 
-applyMorphism :: (MonadIO m, Show a, Monoid a) => Traversal' Value a -> Pipe Value a m r
+applyMorphism :: (MonadIO m) => Traversal' Value a -> Pipe Value [a] m r
 applyMorphism morph = do
   v <- await
-  yield $ v ^. morph
+  yield $ v ^.. morph
   applyMorphism morph
 
 decodeText :: (MonadIO m) => Handle -> Producer Value m ()
@@ -89,8 +89,8 @@ decodeText hdl = pump >-> chunker mempty >-> decoder
         Left e  -> liftIO (print e) >> decoder
 
 
-printText :: (MonadIO m) => Proxy () Text y' y m b
+printText :: (MonadIO m, Show t, Eq t) => Proxy () [t] y' y m b
 printText = do
   c <- await
-  unless (c == "") $ liftIO $ Text.putStrLn c
+  liftIO $ forM_ c $ Text.putStrLn . pack . show
   printText
