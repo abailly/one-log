@@ -31,4 +31,4 @@ main :: IO ()
 main = do
   Options{..} <- unwrapRecord "Lens extractor"
   withFile inputFile ReadMode $ \ hdl ->
-    runEffect $ decodeText hdl >-> applyMorphism (fromMorphism $ parseMorphism expression) >-> printText
+    runEffect $ decodeText hdl >-> applyMorphism (fromMorphism $ parseMorphism expression) >-> printValue
