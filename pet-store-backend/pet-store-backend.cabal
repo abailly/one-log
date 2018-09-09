@@ -1,8 +1,8 @@
--- This file has been generated from package.yaml by hpack version 0.20.0.
+-- This file has been generated from package.yaml by hpack version 0.28.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 084131eff851b8d35e55dbb15d42eb59dd963ca7ca5dfa04bd79816f886ef28c
+-- hash: dbf28d09840bc92f272b221395c7cd055c648d04f7a755b3343de7c9468c17b7
 
 name:           pet-store-backend
 version:        0.0.0
@@ -41,10 +41,11 @@ library
       PetStore.Messages
       PetStore.Server
       PetStore.Config
+      PetStore.Control
+      PetStore.Payment.Api
   other-modules:
       PetStore.Handler
       PetStore.Log
-      PetStore.Payment.Api
       PetStore.Payment.Types
       PetStore.Store
       PetStore.Swagger

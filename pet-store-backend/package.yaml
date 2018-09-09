@@ -31,6 +31,8 @@ library:
     - PetStore.Messages
     - PetStore.Server
     - PetStore.Config
+    - PetStore.Control
+    - PetStore.Payment.Api
   default-extensions:
     - OverloadedStrings
     - RecordWildCards

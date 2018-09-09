@@ -5,11 +5,11 @@
 
 module PetStore.Server where
 
-import           Control.Monad.Except
+import           Control.Concurrent.Async
 import           Control.Monad.Reader
 import           Data.Aeson
 import           Data.Default
-import           Data.Monoid                               ((<>))
+import           Data.IORef
 import           Network.Wai.Handler.Warp                  (run)
 import           Network.Wai.Middleware.RequestLogger
 import           Network.Wai.Middleware.RequestLogger.JSON
@@ -22,13 +22,12 @@ import           PetStore.Store
 import           PetStore.Swagger
 import           Servant
 
-startServer :: ServerConfig -> IO ()
-startServer conf@ServerConfig{..} = do
+startServer :: ServerConfig -> IORef PaymentClient -> IO (Async ())
+startServer conf@ServerConfig{..} clientRef = do
   mlog $ object [ "action" .= ("start" :: String), "configuration" .= conf ]
   store <- makeStore
-  paymentClient <- makeClient paymentHost paymentPort
   logger <- doLog operationMode
-  void $ run listeningPort $ logger $ server store operationMode paymentClient
+  async $ run listeningPort $ logger $ server store operationMode clientRef
     where
       doLog _ = mkRequestLogger $ def { outputFormat = CustomOutputFormatWithDetails formatAsJSON }
 

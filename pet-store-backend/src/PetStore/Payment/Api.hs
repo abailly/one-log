@@ -25,3 +25,6 @@ makeClient h p = do
   let baseUrl = BaseUrl Http h p ""
   env <- ClientEnv <$> newManager defaultManagerSettings <*> pure baseUrl <*> pure Nothing
   pure $ \ pay -> either (PaymentError . show) id <$> runClientM (checkPayment pay) env
+
+nullClient :: PaymentClient
+nullClient = const $ pure $ PaymentError "payment backend service is experiencing troubles, try again"
