@@ -8,8 +8,10 @@ import           Data.ByteString          as BS
 import qualified Data.ByteString.Lazy     as LBS
 import           Data.Functor             (void)
 import           Data.IORef
+import           Data.Text.Encoding       (decodeUtf8)
 import           GHC.Generics
 import           PetStore.Config
+import           PetStore.Log
 import           PetStore.Payment.Api
 import           System.IO                (stdin)
 
@@ -22,7 +24,16 @@ startControl ServerConfig{..} paymentClient = readIORef paymentClient >>= async 
     go pay = do
       bs <- BS.hGetLine stdin
       void $ case decode (LBS.fromStrict bs) of
-        Just BreakCircuit -> atomicModifyIORef' paymentClient $ \ _ -> (nullClient, ())
-        Just RestoreCircuit -> atomicModifyIORef' paymentClient $ \ _ -> (pay, ())
-        Nothing -> pure ()
+        Just BreakCircuit   -> breakCircuit
+        Just RestoreCircuit -> restoreCircuit pay
+        Nothing             ->  mlog $ object [ "error" .= (decodeUtf8 $ "unknown Command " <> bs) ]
+
       go pay
+
+    breakCircuit = do
+      mlog $ object [ "control" .= BreakCircuit ]
+      atomicModifyIORef' paymentClient $ \ _ -> (nullClient, ())
+
+    restoreCircuit pay = do
+      mlog $ object [ "control" .= RestoreCircuit ]
+      atomicModifyIORef' paymentClient $ \ _ -> (pay, ())
