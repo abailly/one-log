@@ -65,3 +65,7 @@ executables:
       - wai
       - wai-middleware-static
       - warp
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
