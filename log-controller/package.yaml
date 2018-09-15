@@ -1,0 +1,65 @@
+name:                log-controller
+version:             0.1.0.0
+github:              "https://github.com/aleryo/one-log"
+license:             BSD3
+author:              "Arnaud Bailly"
+maintainer:          "arnaud@aleryo.com"
+copyright:           "2018 Arnaud Bailly"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/abailly/one-log/log-controller/readme.md>
+
+dependencies:
+- base >= 4.7 && < 5
+- aeson
+- async
+- bytestring
+- lens
+- lens-aeson
+- mtl
+- optparse-generic
+- parsec
+- pipes
+- pipes-bytestring
+- process
+- template-haskell
+- text
+
+library:
+  source-dirs: src
+
+executables:
+  control:
+    main:                control.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - log-controller
+
+tests:
+  log-controller-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - log-controller
+    - file-embed
+    - hspec
+    - hspec-discover
+    - silently
