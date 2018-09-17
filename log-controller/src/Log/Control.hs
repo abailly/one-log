@@ -69,7 +69,7 @@ spawnProc queue fp arg dir = do
 
   case procStart of
     Right (Just hin, Just hout, Just herr, aProc) -> do
-      forM_ [ hin, hout, herr] $ flip hSetBuffering NoBuffering
+      forM_ [ hin, hout, herr] $ flip hSetBuffering LineBuffering
       outtid <- readOutput hout
       errtid <- readOutput herr
       logStart
