@@ -12,7 +12,6 @@ import           Prelude                    hiding ((.))
 import           Data.Aeson
 import           Data.Aeson.Lens
 import           Data.FileEmbed             (makeRelativeToProject)
-import           Data.Text                  (Text)
 import           Language.Haskell.TH.Syntax (Exp (LitE), Lit (StringL))
 import           OneLog.Morphism
 import           Pipes

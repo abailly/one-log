@@ -1,10 +1,10 @@
-name:                one-log
+name:                circuit-breaker
 version:             0.1.0.0
-github:              "githubuser/one-log"
+github:              "https://github.com/aleryo/one-log"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2018 Author name here"
+author:              "Arnaud Bailly"
+maintainer:          "arnaud@aleryo.com"
+copyright:           "2018 Arnaud Bailly"
 
 extra-source-files:
 - README.md
@@ -17,49 +17,30 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/one-log#readme>
+description:         Please see the README on GitHub at <https://github.com/abailly/one-log/log-controller/readme.md>
 
 dependencies:
 - base >= 4.7 && < 5
 - aeson
+- async
 - bytestring
-- containers
-- graphviz
 - lens
 - lens-aeson
+- log-controller
 - mtl
 - optparse-generic
 - parsec
 - pipes
 - pipes-bytestring
+- process
 - template-haskell
-- term-rewriting
 - text
 
-library:
-  source-dirs: src
-
 executables:
-  one-log-exe:
-    main:                Main.hs
+  circuit-breaker:
+    main:                circuit-breaker.hs
     source-dirs:         app
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    dependencies:
-    - one-log
-
-tests:
-  one-log-test:
-    main:                Spec.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - one-log
-    - file-embed
-    - hspec
-    - hspec-discover

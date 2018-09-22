@@ -1,0 +1,246 @@
+digraph G {
+subgraph cluster_id_0 {
+ label="id_0"; color="deepskyblue";
+ node [ shape="box", width=3, height=2, fixedsize=true, color="deepskyblue" ]; edge [ style="dotted"] ;
+st_id_0_0 [ label="[]" ] ;
+st_id_0_1 [ label="[]" ] ;
+st_id_0_2 [ label="[]" ] ;
+st_id_0_3 [ label="[]" ] ;
+st_id_0_4 [ label="[]" ] ;
+st_id_0_5 [ label="[]" ] ;
+st_id_0_6 [ label="[state-4-> []]" ] ;
+st_id_0_7 [ label="[state-4-> []]" ] ;
+st_id_0_8 [ label="[state-4-> []]" ] ;
+st_id_0_9 [ label="[]" ] ;
+st_id_0_10 [ label="[]" ] ;
+st_id_0_11 [ label="[]" ] ;
+st_id_0_12 [ label="[]" ] ;
+st_id_0_13 [ label="[]" ] ;
+st_id_0_14 [ label="[]" ] ;
+st_id_0_15 [ label="[]" ] ;
+st_id_0_16 [ label="[]" ] ;
+st_id_0_17 [ label="[]" ] ;
+st_id_0_18 [ label="[]" ] ;
+st_id_0_19 [ label="[]" ] ;
+st_id_0_20 [ label="[]" ] ;
+st_id_0_21 [ label="[]" ] ;
+st_id_0_22 [ label="[]" ] ;
+st_id_0_0 -> st_id_0_1;
+st_id_0_1 -> st_id_0_2;
+st_id_0_2 -> st_id_0_3;
+st_id_0_3 -> st_id_0_4;
+st_id_0_4 -> st_id_0_5;
+st_id_0_5 -> st_id_0_6;
+st_id_0_6 -> st_id_0_7;
+st_id_0_7 -> st_id_0_8;
+st_id_0_8 -> st_id_0_9;
+st_id_0_9 -> st_id_0_10;
+st_id_0_10 -> st_id_0_11;
+st_id_0_11 -> st_id_0_12;
+st_id_0_12 -> st_id_0_13;
+st_id_0_13 -> st_id_0_14;
+st_id_0_14 -> st_id_0_15;
+st_id_0_15 -> st_id_0_16;
+st_id_0_16 -> st_id_0_17;
+st_id_0_17 -> st_id_0_18;
+st_id_0_18 -> st_id_0_19;
+st_id_0_19 -> st_id_0_20;
+st_id_0_20 -> st_id_0_21;
+st_id_0_21 -> st_id_0_22;
+}
+
+subgraph cluster_id_1 {
+ label="id_1"; color="turquoise1";
+ node [ shape="box", width=3, height=2, fixedsize=true, color="turquoise1" ]; edge [ style="dotted"] ;
+st_id_1_0 [ label="[]" ] ;
+st_id_1_1 [ label="[]" ] ;
+st_id_1_2 [ label="[]" ] ;
+st_id_1_3 [ label="[]" ] ;
+st_id_1_4 [ label="[]" ] ;
+st_id_1_5 [ label="[]" ] ;
+st_id_1_6 [ label="[]" ] ;
+st_id_1_7 [ label="[]" ] ;
+st_id_1_8 [ label="[state-4-> []]" ] ;
+st_id_1_9 [ label="[state-4-> []]" ] ;
+st_id_1_10 [ label="[state-4-> []]" ] ;
+st_id_1_11 [ label="[state-4-> []]" ] ;
+st_id_1_12 [ label="[state-4-> []]" ] ;
+st_id_1_13 [ label="[state-4-> []]" ] ;
+st_id_1_14 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_1_15 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_1_16 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_1_17 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_1_18 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_1_19 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_1_20 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_1_21 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_1_22 [ label="[ state-4-> [ (state-4-0, 94)\n            , (state-4-1, 16) ] ]" ] ;
+st_id_1_0 -> st_id_1_1;
+st_id_1_1 -> st_id_1_2;
+st_id_1_2 -> st_id_1_3;
+st_id_1_3 -> st_id_1_4;
+st_id_1_4 -> st_id_1_5;
+st_id_1_5 -> st_id_1_6;
+st_id_1_6 -> st_id_1_7;
+st_id_1_7 -> st_id_1_8;
+st_id_1_8 -> st_id_1_9;
+st_id_1_9 -> st_id_1_10;
+st_id_1_10 -> st_id_1_11;
+st_id_1_11 -> st_id_1_12;
+st_id_1_12 -> st_id_1_13;
+st_id_1_13 -> st_id_1_14;
+st_id_1_14 -> st_id_1_15;
+st_id_1_15 -> st_id_1_16;
+st_id_1_16 -> st_id_1_17;
+st_id_1_17 -> st_id_1_18;
+st_id_1_18 -> st_id_1_19;
+st_id_1_19 -> st_id_1_20;
+st_id_1_20 -> st_id_1_21;
+st_id_1_21 -> st_id_1_22;
+}
+
+subgraph cluster_id_2 {
+ label="id_2"; color="turquoise2";
+ node [ shape="box", width=3, height=2, fixedsize=true, color="turquoise2" ]; edge [ style="dotted"] ;
+st_id_2_0 [ label="[]" ] ;
+st_id_2_1 [ label="[]" ] ;
+st_id_2_2 [ label="[]" ] ;
+st_id_2_3 [ label="[]" ] ;
+st_id_2_4 [ label="[state-4-> []]" ] ;
+st_id_2_5 [ label="[state-4-> []]" ] ;
+st_id_2_6 [ label="[state-4-> []]" ] ;
+st_id_2_7 [ label="[state-4-> []]" ] ;
+st_id_2_8 [ label="[state-4-> []]" ] ;
+st_id_2_9 [ label="[]" ] ;
+st_id_2_10 [ label="[]" ] ;
+st_id_2_11 [ label="[]" ] ;
+st_id_2_12 [ label="[]" ] ;
+st_id_2_13 [ label="[]" ] ;
+st_id_2_14 [ label="[]" ] ;
+st_id_2_15 [ label="[]" ] ;
+st_id_2_16 [ label="[]" ] ;
+st_id_2_17 [ label="[]" ] ;
+st_id_2_18 [ label="[]" ] ;
+st_id_2_19 [ label="[]" ] ;
+st_id_2_20 [ label="[]" ] ;
+st_id_2_21 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_2_22 [ label="[ state-4-> [ (state-4-0, 94)\n            , (state-4-1, 16) ] ]" ] ;
+st_id_2_0 -> st_id_2_1;
+st_id_2_1 -> st_id_2_2;
+st_id_2_2 -> st_id_2_3;
+st_id_2_3 -> st_id_2_4;
+st_id_2_4 -> st_id_2_5;
+st_id_2_5 -> st_id_2_6;
+st_id_2_6 -> st_id_2_7;
+st_id_2_7 -> st_id_2_8;
+st_id_2_8 -> st_id_2_9;
+st_id_2_9 -> st_id_2_10;
+st_id_2_10 -> st_id_2_11;
+st_id_2_11 -> st_id_2_12;
+st_id_2_12 -> st_id_2_13;
+st_id_2_13 -> st_id_2_14;
+st_id_2_14 -> st_id_2_15;
+st_id_2_15 -> st_id_2_16;
+st_id_2_16 -> st_id_2_17;
+st_id_2_17 -> st_id_2_18;
+st_id_2_18 -> st_id_2_19;
+st_id_2_19 -> st_id_2_20;
+st_id_2_20 -> st_id_2_21;
+st_id_2_21 -> st_id_2_22;
+}
+
+subgraph cluster_id_3 {
+ label="id_3"; color="turquoise3";
+ node [ shape="box", width=3, height=2, fixedsize=true, color="turquoise3" ]; edge [ style="dotted"] ;
+st_id_3_0 [ label="[]" ] ;
+st_id_3_1 [ label="[]" ] ;
+st_id_3_2 [ label="[]" ] ;
+st_id_3_3 [ label="[]" ] ;
+st_id_3_4 [ label="[]" ] ;
+st_id_3_5 [ label="[]" ] ;
+st_id_3_6 [ label="[]" ] ;
+st_id_3_7 [ label="[state-4-> []]" ] ;
+st_id_3_8 [ label="[state-4-> []]" ] ;
+st_id_3_9 [ label="[]" ] ;
+st_id_3_10 [ label="[]" ] ;
+st_id_3_11 [ label="[state-4-> []]" ] ;
+st_id_3_12 [ label="[state-4-> []]" ] ;
+st_id_3_13 [ label="[state-4-> []]" ] ;
+st_id_3_14 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_3_15 [ label="[state-4-> [(state-4-0, 94)]]" ] ;
+st_id_3_16 [ label="[]" ] ;
+st_id_3_17 [ label="[]" ] ;
+st_id_3_18 [ label="[]" ] ;
+st_id_3_19 [ label="[]" ] ;
+st_id_3_20 [ label="[]" ] ;
+st_id_3_21 [ label="[]" ] ;
+st_id_3_22 [ label="[]" ] ;
+st_id_3_0 -> st_id_3_1;
+st_id_3_1 -> st_id_3_2;
+st_id_3_2 -> st_id_3_3;
+st_id_3_3 -> st_id_3_4;
+st_id_3_4 -> st_id_3_5;
+st_id_3_5 -> st_id_3_6;
+st_id_3_6 -> st_id_3_7;
+st_id_3_7 -> st_id_3_8;
+st_id_3_8 -> st_id_3_9;
+st_id_3_9 -> st_id_3_10;
+st_id_3_10 -> st_id_3_11;
+st_id_3_11 -> st_id_3_12;
+st_id_3_12 -> st_id_3_13;
+st_id_3_13 -> st_id_3_14;
+st_id_3_14 -> st_id_3_15;
+st_id_3_15 -> st_id_3_16;
+st_id_3_16 -> st_id_3_17;
+st_id_3_17 -> st_id_3_18;
+st_id_3_18 -> st_id_3_19;
+st_id_3_19 -> st_id_3_20;
+st_id_3_20 -> st_id_3_21;
+st_id_3_21 -> st_id_3_22;
+}
+
+{ rank=same; st_id_0_1;st_id_1_1;st_id_2_1;st_id_3_1; }
+{ rank=same; st_id_0_2;st_id_1_2;st_id_2_2;st_id_3_2; }
+{ rank=same; st_id_0_3;st_id_1_3;st_id_2_3;st_id_3_3; }
+{ rank=same; st_id_0_4;st_id_1_4;st_id_2_4;st_id_3_4; }
+{ rank=same; st_id_0_5;st_id_1_5;st_id_2_5;st_id_3_5; }
+{ rank=same; st_id_0_6;st_id_1_6;st_id_2_6;st_id_3_6; }
+{ rank=same; st_id_0_7;st_id_1_7;st_id_2_7;st_id_3_7; }
+{ rank=same; st_id_0_8;st_id_1_8;st_id_2_8;st_id_3_8; }
+{ rank=same; st_id_0_9;st_id_1_9;st_id_2_9;st_id_3_9; }
+{ rank=same; st_id_0_10;st_id_1_10;st_id_2_10;st_id_3_10; }
+{ rank=same; st_id_0_11;st_id_1_11;st_id_2_11;st_id_3_11; }
+{ rank=same; st_id_0_12;st_id_1_12;st_id_2_12;st_id_3_12; }
+{ rank=same; st_id_0_13;st_id_1_13;st_id_2_13;st_id_3_13; }
+{ rank=same; st_id_0_14;st_id_1_14;st_id_2_14;st_id_3_14; }
+{ rank=same; st_id_0_15;st_id_1_15;st_id_2_15;st_id_3_15; }
+{ rank=same; st_id_0_16;st_id_1_16;st_id_2_16;st_id_3_16; }
+{ rank=same; st_id_0_17;st_id_1_17;st_id_2_17;st_id_3_17; }
+{ rank=same; st_id_0_18;st_id_1_18;st_id_2_18;st_id_3_18; }
+{ rank=same; st_id_0_19;st_id_1_19;st_id_2_19;st_id_3_19; }
+{ rank=same; st_id_0_20;st_id_1_20;st_id_2_20;st_id_3_20; }
+{ rank=same; st_id_0_21;st_id_1_21;st_id_2_21;st_id_3_21; }
+{ rank=same; st_id_0_22;st_id_1_22;st_id_2_22;st_id_3_22; }
+st_id_0_0 -> st_id_0_1 [ label="RegIdentity (SymbiontIdentity {symbiontIdentity = \"id-0\"}) (NodeName \"node-2\")"] ;
+st_id_2_1 -> st_id_2_2 [ label="RegIdentity (SymbiontIdentity {symbiontIdentity = \"id-2\"}) (NodeName \"node-2\")"] ;
+st_id_1_2 -> st_id_1_3 [ label="RegIdentity (SymbiontIdentity {symbiontIdentity = \"id-1\"}) (NodeName \"node-3\")"] ;
+st_id_2_3 -> st_id_2_4 [ label="MakeState (SymbiontIdentity {symbiontIdentity = \"id-2\"}) (StateName \"state-4\")"] ;
+st_id_3_4 -> st_id_3_5 [ label="RegIdentity (SymbiontIdentity {symbiontIdentity = \"id-3\"}) (NodeName \"node-1\")"] ;
+st_id_2_5 -> st_id_0_6 [ label="AddOwner (SymbiontIdentity {symbiontIdentity = \"id-2\"}) (StateName \"state-4\",SymbiontIdentity {symbiontIdentity = \"id-0\"})"] ;
+st_id_0_6 -> st_id_3_7 [ label="AddOwner (SymbiontIdentity {symbiontIdentity = \"id-0\"}) (StateName \"state-4\",SymbiontIdentity {symbiontIdentity = \"id-3\"})"] ;
+st_id_0_7 -> st_id_1_8 [ label="AddOwner (SymbiontIdentity {symbiontIdentity = \"id-0\"}) (StateName \"state-4\",SymbiontIdentity {symbiontIdentity = \"id-1\"})"] ;
+st_id_1_8 -> st_id_1_9 [ label="RotKey (SymbiontIdentity {symbiontIdentity = \"id-1\"}) (StateName \"state-4\")"] ;
+st_id_1_9 -> st_id_1_10 [ label="RemoveOwner (SymbiontIdentity {symbiontIdentity = \"id-1\"}) (StateName \"state-4\",SymbiontIdentity {symbiontIdentity = \"id-1\"})"] ;
+st_id_1_10 -> st_id_3_11 [ label="SendKey (SymbiontIdentity {symbiontIdentity = \"id-1\"}) (SymbiontIdentity {symbiontIdentity = \"id-3\"}) (StateName \"state-4\")"] ;
+st_id_3_11 -> st_id_1_12 [ label="AddOwner (SymbiontIdentity {symbiontIdentity = \"id-3\"}) (StateName \"state-4\",SymbiontIdentity {symbiontIdentity = \"id-1\"})"] ;
+st_id_3_12 -> st_id_3_13 [ label="RemoveOwner (SymbiontIdentity {symbiontIdentity = \"id-3\"}) (StateName \"state-4\",SymbiontIdentity {symbiontIdentity = \"id-3\"})"] ;
+st_id_3_13 -> st_id_3_14 [ label="InitCounter (SymbiontIdentity {symbiontIdentity = \"id-3\"}) (StateName \"state-4\") 94"] ;
+
+st_id_1_15 -> st_id_1_16 [ label="RotKey (SymbiontIdentity {symbiontIdentity = \"id-1\"}) (StateName \"state-4\")"] ;
+st_id_0_16 -> st_id_0_17 [ label="InitCounter (SymbiontIdentity {symbiontIdentity = \"id-0\"}) (StateName \"state-3\") 39"] ;
+st_id_2_17 -> st_id_2_18 [ label="RotKey (SymbiontIdentity {symbiontIdentity = \"id-2\"}) (StateName \"state-1\")"] ;
+st_id_0_18 -> st_id_1_19 [ label="RemoveOwner (SymbiontIdentity {symbiontIdentity = \"id-0\"}) (StateName \"state-2\",SymbiontIdentity {symbiontIdentity = \"id-1\"})"] ;
+st_id_0_19 -> st_id_0_20 [ label="InitCounter (SymbiontIdentity {symbiontIdentity = \"id-0\"}) (StateName \"state-0\") 76"] ;
+st_id_1_20 -> st_id_2_21 [ label="AddOwner (SymbiontIdentity {symbiontIdentity = \"id-1\"}) (StateName \"state-4\",SymbiontIdentity {symbiontIdentity = \"id-2\"})"] ;
+st_id_2_21 -> st_id_2_22 [ label="InitCounter (SymbiontIdentity {symbiontIdentity = \"id-2\"}) (StateName \"state-4\") 16"] ;
+}

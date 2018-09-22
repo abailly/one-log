@@ -1,24 +1,24 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE RecordWildCards     #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-module Log.Control where
+module Log.Control
+  ( controlMain, runControl
+  , Controller, LogEntry(..), Message(..)
+  ) where
 
 import           Control.Concurrent.Async
 import           Control.Concurrent.Chan
-import           Control.Exception        (BlockedIndefinitelyOnMVar,
-                                           BlockedIndefinitelyOnSTM,
-                                           Handler (..), IOException, catch,
-                                           catches, finally, throw, throwIO,
-                                           try)
+import           Control.Exception        (IOException, catch, finally, throw,
+                                           throwIO, try)
 import           Control.Monad            (forM_, forever, void, when)
 import           Data.Aeson
 import qualified Data.ByteString          as BS
 import qualified Data.ByteString.Lazy     as LB
 import qualified Data.Text.Lazy           as Text
 import           Log.Tail
-import           System.Exit
+import           System.Environment
 import           System.IO                (BufferMode (..), Handle,
-                                           hSetBuffering, stdin)
+                                           hSetBuffering, stdin, stdout)
 import           System.IO.Error
 import           System.Process
 
@@ -28,10 +28,18 @@ data Control = Control { spawnedProcess :: Async ()
                        , errStream      :: Async ()
                        }
 
-runControl :: FilePath -> [ String ] -> FilePath -> IO ()
-runControl executable arguments workingDir = do
+controlMain :: Controller -> IO ()
+controlMain controller = do
+  hSetBuffering stdin NoBuffering
+  hSetBuffering stdout NoBuffering
+  (process:arguments) <- getArgs
+  runControl process arguments "." controller
+
+runControl :: FilePath -> [ String ] -> FilePath
+           -> Controller -> IO ()
+runControl executable arguments workingDir controller = do
   q <- newChan
-  tailer <- tailLogs q (pure . return)
+  tailer <- tailLogs q controller
   Control{..} <- spawnProc q executable arguments workingDir
   -- process and stream handler threads will terminate "naturally"  when
   -- the process ends or the pipes get closed, respectively

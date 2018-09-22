@@ -8,9 +8,14 @@ packages:
   - 'pet-store-backend'
   - 'osquery-server'
   - 'one-log'
+  - 'log-controller'
+  - 'circuit-breaker'
 extra-deps:
   - unagi-chan-0.4.0.0
   - MonadPrompt-1.0.0.5
+  - term-rewriting-0.2.1.1
+  - multiset-0.3.4
+  - union-find-array-0.1.0.2
 resolver: lts-12.5
 image:
   containers:
