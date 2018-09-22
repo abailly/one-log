@@ -5,13 +5,10 @@
 {-# LANGUAGE RecordWildCards    #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeOperators      #-}
-
 module Main where
 
 import           Log.Control
+import           OneLog.CircuitBreaker
 
 main :: IO ()
 main = controlMain controlCircuit
-
-controlCircuit :: Controller
-controlCircuit _ = undefined

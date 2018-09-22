@@ -3,6 +3,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module Log.Control
   ( controlMain, runControl
+  , safeDecodeUtf8, jsonFromText, jsonToText, logEntry
   , Controller, LogEntry(..), Message(..)
   ) where
 
@@ -61,17 +62,17 @@ spawnProc queue fp arg dir = do
       readOutput hd = async $
         forever ((do
                     l <- LB.fromStrict <$> BS.hGetLine hd
-                    writeChan queue (logEntry name l))
+                    writeChan queue =<< logEntry name l)
                  `catch` (\ e  -> do
-                             writeChan queue (logEntry name $
-                                               encode $
-                                               object [ "process" .=  name
-                                                      , "error" .= show e ])
+                             writeChan queue =<< (logEntry name $
+                                                  encode $
+                                                  object [ "process" .=  name
+                                                         , "error" .= show e ])
                              when (isEOFError e) $ throw e
                          ))
 
-      logStart = writeChan queue $ logEntry "control" (encode $ object [ "message" .= Text.pack ("starting " <> fp <> " " <> unwords arg) ])
-      logStop = writeChan queue $ logEntry "control" (encode $ object [ "message" .= Text.pack ("stopped " <> fp <> " " <> unwords arg) ])
+      logStart = writeChan queue =<< logEntry "control" (encode $ object [ "message" .= Text.pack ("starting " <> fp <> " " <> unwords arg) ])
+      logStop = writeChan queue =<< logEntry "control" (encode $ object [ "message" .= Text.pack ("stopped " <> fp <> " " <> unwords arg) ])
 
   procStart <- try (createProcess ((proc fp arg) { cwd = Just dir, std_in = CreatePipe, std_out = CreatePipe, std_err = CreatePipe }))
 

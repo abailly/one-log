@@ -13,17 +13,20 @@ import qualified Data.ByteString.Lazy     as LBS
 import           Data.Text.Encoding.Error
 import qualified Data.Text.Lazy           as Text
 import           Data.Text.Lazy.Encoding
+import           Data.Time.Clock
 import           System.IO
 
 -- |Entries that can be fed to a `LogQueue`
-data LogEntry = LogEntry Message
+data LogEntry = LogEntry UTCTime Message
               -- ^A log message originating from some service
               | EndOfLog
               -- ^A /Poison Pill/  to stop the logging thread
   deriving (Eq, Show)
 
-logEntry :: Text.Text -> LBS.ByteString -> LogEntry
-logEntry o c = LogEntry $ Message o c
+logEntry :: Text.Text -> LBS.ByteString -> IO LogEntry
+logEntry o c = do
+  ts <- getCurrentTime
+  pure $ LogEntry ts (Message o c)
 
 data Message = Message { origin :: Text.Text
                          -- ^An arbitrary label for messages
@@ -52,15 +55,15 @@ tailLogs logSource logSink =  liftIO $ async doLog
       entries <- logSink entry
       forM_ entries writeLog
       case entry of
-        LogEntry _ -> doLog
-        EndOfLog   -> pure ()
+        LogEntry _ _ -> doLog
+        EndOfLog     -> pure ()
 
     writeLog EndOfLog = pure ()
-    writeLog (LogEntry Message{..}) =
+    writeLog (LogEntry ts Message{..}) =
       let
         fullMsg = either
-                  (const $ object ["node" .= origin, "log" .= object [ "message" .= (safeDecodeUtf8 msg :: Text.Text)]])
-                  (\ m ->  object ["node" .= origin, "log" .= m ])
+                  (const $ object ["node" .= origin, "timestamp" .= ts, "log" .= object [ "message" .= (safeDecodeUtf8 msg :: Text.Text)]])
+                  (\ m ->  object ["node" .= origin, "timestamp" .= ts, "log" .= m ])
                   (jsonFromText msg :: Either Text.Text Value)
 
         msgString = encode fullMsg

@@ -5,6 +5,7 @@ license:             BSD3
 author:              "Arnaud Bailly"
 maintainer:          "arnaud@aleryo.com"
 copyright:           "2018 Arnaud Bailly"
+ghc-options:  -Wall -Werror
 
 extra-source-files:
 - README.md
@@ -30,11 +31,16 @@ dependencies:
 - mtl
 - optparse-generic
 - parsec
+- pet-store-backend
 - pipes
 - pipes-bytestring
 - process
 - template-haskell
 - text
+
+library:
+  source-dirs: src
+  exposed-modules: OneLog.CircuitBreaker
 
 executables:
   circuit-breaker:
@@ -44,3 +50,17 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+
+tests:
+  circuit-breaker-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - circuit-breaker
+    - file-embed
+    - hspec
+    - hspec-discover
