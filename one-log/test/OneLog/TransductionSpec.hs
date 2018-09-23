@@ -9,7 +9,7 @@ import           Prelude                    hiding ((.))
 --import           Data.Time.Clock
 import           Data.FileEmbed             (makeRelativeToProject)
 import           Language.Haskell.TH.Syntax (Exp (LitE), Lit (StringL))
-import           OneLog.Transduction
+--import           OneLog.Transduction
 import           System.IO
 import           Test.Hspec
 

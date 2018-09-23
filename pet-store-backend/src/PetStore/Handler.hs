@@ -7,7 +7,6 @@ module PetStore.Handler where
 import           Control.Monad.Except
 import           Control.Monad.Reader
 import           Data.IORef
-import           Data.Monoid          ((<>))
 import           PetStore.Log
 import           PetStore.Messages
 import           PetStore.Payment.Api
