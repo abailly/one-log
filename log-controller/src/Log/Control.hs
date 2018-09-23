@@ -4,6 +4,7 @@
 module Log.Control
   ( controlMain, runControl
   , safeDecodeUtf8, jsonFromText, jsonToText, logEntry
+  , newControlChannel
   , Controller, LogEntry(..), Message(..)
   ) where
 
@@ -29,15 +30,19 @@ data Control = Control { spawnedProcess :: Async ()
                        , errStream      :: Async ()
                        }
 
-controlMain :: Controller -> IO ()
+newControlChannel :: IO (Chan a)
+newControlChannel = newChan
+
+controlMain :: (Chan BS.ByteString -> Controller) -> IO ()
 controlMain controller = do
   mapM_ (flip hSetBuffering NoBuffering) [ stdin, stdout, stderr ]
   (process:arguments) <- getArgs
-  runControl process arguments "." controller
+  chan <- newControlChannel
+  runControl process arguments "." chan (controller chan)
 
 runControl :: FilePath -> [ String ] -> FilePath
-           -> Controller -> IO ()
-runControl executable arguments workingDir controller = do
+           -> Chan BS.ByteString -> Controller -> IO ()
+runControl executable arguments workingDir chan controller = do
   q <- newChan
   tailer <- tailLogs q controller
   Control{..} <- spawnProc q executable arguments workingDir
@@ -50,7 +55,7 @@ runControl executable arguments workingDir controller = do
   void $ waitAnyCancel [ tailer, cmd ]
   where
     readCommands hdl = async $ forever $ do
-      bs <- BS.hGetLine stdin
+      bs <- readChan chan
       BS.hPutStr hdl (bs <> "\n")
 
 spawnProc :: LogQueue -> FilePath -> [ String ] -> FilePath -> IO Control

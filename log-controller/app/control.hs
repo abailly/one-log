@@ -17,4 +17,5 @@ main = do
   hSetBuffering stdin NoBuffering
   hSetBuffering stdout NoBuffering
   (process:arguments) <- getArgs
-  runControl process arguments "." (pure . return)
+  chan <- newControlChannel
+  runControl process arguments "." chan (pure . return)
