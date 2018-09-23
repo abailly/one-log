@@ -7,8 +7,11 @@
 {-# LANGUAGE TypeOperators      #-}
 module Main where
 
+import           Data.IORef
 import           Log.Control
 import           OneLog.CircuitBreaker
 
 main :: IO ()
-main = controlMain controlCircuit
+main = do
+  ref <- newIORef initialState
+  controlMain (controlCircuit ref)

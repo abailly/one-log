@@ -47,7 +47,7 @@ checkout paymentClient user payment = do
   res <- liftIO $ (readIORef paymentClient) >>= ($ payment)
   case res of
     PaymentResult _ True -> send (CheckoutBasket user payment) store
-    _                    -> mlog ("failed to validate payment" <> show res) >> pure (Error InvalidPayment)
+    _                    -> mlog res >> mlog (Error InvalidPayment) >> pure (Error InvalidPayment)
 
 listBasket       :: User -> PetServer m Output
 listBasket user = ask >>= send (GetUserBasket user)

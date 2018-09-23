@@ -19,7 +19,7 @@ import qualified Data.Text.Lazy           as Text
 import           Log.Tail
 import           System.Environment
 import           System.IO                (BufferMode (..), Handle,
-                                           hSetBuffering, stdin, stdout)
+                                           hSetBuffering, stderr, stdin, stdout)
 import           System.IO.Error
 import           System.Process
 
@@ -31,8 +31,7 @@ data Control = Control { spawnedProcess :: Async ()
 
 controlMain :: Controller -> IO ()
 controlMain controller = do
-  hSetBuffering stdin NoBuffering
-  hSetBuffering stdout NoBuffering
+  mapM_ (flip hSetBuffering NoBuffering) [ stdin, stdout, stderr ]
   (process:arguments) <- getArgs
   runControl process arguments "." controller
 

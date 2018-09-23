@@ -26,6 +26,6 @@ instance ToJSON NoContent where
 instance (MonadIO m) => MonadLog m where
   mlog a = liftIO $ do
     ts <- systemToUTCTime <$> getSystemTime
-    IO.putStrLn $ encode $ object [ "timestamp" .= formatTime defaultTimeLocale (iso8601DateFormat (Just "%H:%M:%S%Q")) ts
+    IO.putStrLn $ encode $ object [ "timestamp" .= formatTime defaultTimeLocale (iso8601DateFormat (Just "%H:%M:%S%QZ")) ts
                                   , "message" .= a
                                   ]

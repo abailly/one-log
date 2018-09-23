@@ -15,6 +15,6 @@ spec = describe "Circuit Breaker" $ do
   it "sets timestamp and increment state when receiving error given state is initial" $ do
     ref <- newIORef $ CurrentState Nothing 0
 
-    let entry = LogEntry time (Message "petstore" $ encode (Error InvalidPayment))
+    let entry = LogEntry time (Message "petstore" $ encode (WrappedLog time (Error InvalidPayment)))
     controlCircuit ref entry
-      `shouldReturn` [ LogEntry time (Message "controller" $ encode (CurrentState (Just time) 1)), entry ]
+      `shouldReturn` [ LogEntry time (Message "circuit-breaker" $ encode (CurrentState (Just time) 1)), entry ]
