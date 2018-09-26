@@ -5,7 +5,6 @@
 module OneLog.CircuitBreaker where
 
 import           Control.Concurrent.Chan
-import           Control.Monad           (when)
 import           Data.Aeson              (FromJSON, ToJSON, encode)
 import           Data.ByteString         (ByteString)
 import qualified Data.ByteString.Lazy    as LBS
@@ -19,40 +18,58 @@ import           PetStore.Messages
 data WrappedLog = WrappedLog { timestamp :: UTCTime, message :: Output }
   deriving (Show, Generic, ToJSON, FromJSON)
 
-data CurrentState = CurrentState { firstError :: Maybe UTCTime
-                                 , errorCount :: Int
-                                 }
+data CurrentState = NotBroken { firstError :: Maybe UTCTime
+                              , errorCount :: Int
+                              }
+                  | Broken { breakTime :: UTCTime }
                   deriving(Show, Generic, ToJSON)
 
 initialState :: CurrentState
-initialState = CurrentState Nothing 0
+initialState = NotBroken Nothing 0
 
 controlCircuit :: Chan ByteString -> IORef CurrentState -> Controller
 controlCircuit _chan _ref EndOfLog = pure <$> logEntry "circuit-breaker" "\"Exiting\""
 controlCircuit chan ref entry@(LogEntry ts Message{..}) = do
   case jsonFromText msg of
     Right (WrappedLog{message = Error InvalidPayment}) -> handlePaymentError chan ref entry ts
---    Right (CheckedOutBasket{})   -> resetError ref entry
+    Right (WrappedLog _ _)   -> resetError ref entry
     _                            -> pure [ entry ]
+
+resetError :: Chan ByteString -> IORef CurrentState -> LogEntry -> IO [ LogEntry ]
+resetError chan ref entry = do
+  st <- readIORef ref
+  case st of
+    Broken{breakTime} -> case  entry of
+
 
 handlePaymentError :: Chan ByteString -> IORef CurrentState -> LogEntry -> UTCTime -> IO [ LogEntry ]
 handlePaymentError chan ref entry ts = do
   st <- readIORef ref
   case st of
-    CurrentState Nothing 0 -> resetLastError
-    CurrentState (Just startTime) n
+    NotBroken Nothing 0 -> resetLastError
+    NotBroken (Just startTime) n
       | diffUTCTime ts startTime < 10 -> incrementErrorCount startTime n
       | otherwise                     -> resetLastError
     _ -> pure [ entry ]
 
   where
     resetLastError = do
-      let newSt = CurrentState (Just ts) 1
+      let newSt = NotBroken (Just ts) 1
       writeIORef ref newSt
       pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt) , entry ]
 
     incrementErrorCount startTime n =  do
-      let newSt = CurrentState (Just startTime) (n + 1)
+      newState <- if (n >= 2)
+        then breakCircuit
+        else updateErrorCount startTime (n + 1)
+      pure [ LogEntry ts (Message "circuit-breaker" $ encode newState) , entry ]
+
+    breakCircuit = do
+      let newSt = Broken ts
+      writeChan chan (LBS.toStrict $ encode BreakCircuit)
+      return newSt
+
+    updateErrorCount startTime n = do
+      let newSt = NotBroken (Just startTime) n
       writeIORef ref newSt
-      when (n >= 2) $ writeChan chan (LBS.toStrict $ encode BreakCircuit)
-      pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt) , entry ]
+      pure newSt
