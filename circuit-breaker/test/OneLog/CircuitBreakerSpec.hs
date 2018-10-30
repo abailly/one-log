@@ -22,7 +22,7 @@ spec = describe "Circuit Breaker" $ do
       chan <- newControlChannel
 
       let entry = LogEntry time (Message "petstore" $ encode (WrappedLog time (Error InvalidPayment)))
-      controlCircuit chan ref entry
+      controlCircuit (CircuitBreaker chan ref) entry
         `shouldReturn` [ LogEntry time (Message "circuit-breaker" $ encode (NotBroken (Just time) 1)), entry ]
 
     it "increments state given state is not initial and timestamp is within 10s" $ do
@@ -31,7 +31,7 @@ spec = describe "Circuit Breaker" $ do
       chan <- newControlChannel
 
       let entry = LogEntry fiveSecondsLater (Message "petstore" $ encode (WrappedLog time (Error InvalidPayment)))
-      controlCircuit chan ref entry
+      controlCircuit (CircuitBreaker chan ref) entry
         `shouldReturn` [ LogEntry fiveSecondsLater (Message "circuit-breaker" $ encode (NotBroken (Just time) 2)), entry ]
 
     it "resets timestamp given state is not initial and timestamp is over 10s" $ do
@@ -40,7 +40,7 @@ spec = describe "Circuit Breaker" $ do
       chan <- newControlChannel
 
       let entry = LogEntry tenSecondsLater (Message "petstore"  $ encode (WrappedLog time (Error InvalidPayment)))
-      controlCircuit chan ref entry
+      controlCircuit (CircuitBreaker chan ref) entry
         `shouldReturn` [ LogEntry tenSecondsLater (Message "circuit-breaker" $ encode (NotBroken (Just tenSecondsLater) 1)), entry ]
 
     it "breaks circuit when error count reaches 3" $ do
@@ -49,7 +49,7 @@ spec = describe "Circuit Breaker" $ do
       chan <- newControlChannel
 
       let entry = LogEntry oneSecondsLater (Message "petstore"  $ encode (WrappedLog time (Error InvalidPayment)))
-      controlCircuit chan ref entry
+      controlCircuit (CircuitBreaker chan ref) entry
         `shouldReturn` [ LogEntry oneSecondsLater (Message "circuit-breaker" $ encode (Broken oneSecondsLater)), entry ]
 
       decode . LBS.fromStrict <$> readChan chan `shouldReturn` Just BreakCircuit
@@ -63,7 +63,7 @@ spec = describe "Circuit Breaker" $ do
 
       let entry = LogEntry thirtySecondsLater (Message "petstore"  $ encode (WrappedLog time (UserLoggedIn $ User "bob")))
 
-      controlCircuit chan ref entry
+      controlCircuit (CircuitBreaker chan ref) entry
         `shouldReturn` [ LogEntry thirtySecondsLater (Message "circuit-breaker" $ encode (HalfBroken time)), entry ]
 
       decode . LBS.fromStrict <$> readChan chan `shouldReturn` Just RestoreCircuit
@@ -76,7 +76,7 @@ spec = describe "Circuit Breaker" $ do
 
       let entry = LogEntry time (Message "petstore"  $ encode (WrappedLog time (CheckedOutBasket (User "bob") (Payment "1234") 100)))
 
-      controlCircuit chan ref entry
+      controlCircuit (CircuitBreaker chan ref) entry
         `shouldReturn` [ LogEntry time (Message "circuit-breaker" $ encode (NotBroken Nothing 0)), entry ]
 
     it "close circuit again given payment fails" $ do
@@ -86,7 +86,7 @@ spec = describe "Circuit Breaker" $ do
 
       let entry = LogEntry tenSecondsLater (Message "petstore"  $ encode (WrappedLog tenSecondsLater (Error InvalidPayment)))
 
-      controlCircuit chan ref entry
+      controlCircuit (CircuitBreaker chan ref) entry
         `shouldReturn` [ LogEntry tenSecondsLater (Message "circuit-breaker" $ encode (Broken tenSecondsLater)), entry ]
 
       decode . LBS.fromStrict <$> readChan chan `shouldReturn` Just BreakCircuit

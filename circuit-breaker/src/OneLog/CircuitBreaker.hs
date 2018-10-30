@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE ConstraintKinds    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -6,6 +7,7 @@
 module OneLog.CircuitBreaker where
 
 import           Control.Concurrent.Chan
+import           Control.Monad.Reader
 import           Data.Aeson              (FromJSON, ToJSON, encode)
 import           Data.ByteString         (ByteString)
 import qualified Data.ByteString.Lazy    as LBS
@@ -19,6 +21,14 @@ import           PetStore.Messages
 data WrappedLog = WrappedLog { timestamp :: UTCTime, message :: Output }
   deriving (Show, Generic, ToJSON, FromJSON)
 
+-- * Low-level Operations on Circuit Breaker
+
+-- ** Types
+
+data CircuitBreaker = CircuitBreaker { controlChannel :: Chan ByteString
+                                     , stateRef :: IORef CurrentState
+                                     }
+
 data CurrentState = NotBroken { firstError :: Maybe UTCTime
                               , errorCount :: Int
                               }
@@ -26,66 +36,87 @@ data CurrentState = NotBroken { firstError :: Maybe UTCTime
                   | HalfBroken { breakTime :: UTCTime }
                   deriving(Show, Generic, ToJSON)
 
+-- ** Operations
+
 initialState :: CurrentState
 initialState = NotBroken Nothing 0
 
-controlCircuit :: Chan ByteString -> IORef CurrentState -> Controller
-controlCircuit _chan _ref EndOfLog = pure <$> logEntry "circuit-breaker" "\"Exiting\""
-controlCircuit chan ref entry@(LogEntry ts Message{..}) = do
+logCircuitBreaker :: ToJSON a => UTCTime -> a -> LogEntry
+logCircuitBreaker ts = LogEntry ts . Message "circuit-breaker" . encode
+
+sendCommand :: CircuitBreakerM m => ToJSON a => a -> m ()
+sendCommand c = asks controlChannel >>= \ chan -> liftIO $ writeChan chan (LBS.toStrict $ encode c)
+
+changeState :: CircuitBreakerM m => CurrentState -> m ()
+changeState st = do
+  ref <- asks stateRef
+  liftIO $ writeIORef ref st
+
+getState :: CircuitBreakerM m => m CurrentState
+getState = asks stateRef >>= liftIO . readIORef
+
+type CircuitBreakerM m = (MonadReader CircuitBreaker m, MonadIO m)
+
+-- * Circuit Breaker Logic
+
+controlCircuit :: CircuitBreaker -> Controller
+controlCircuit circuitBreaker entry@(LogEntry ts Message{..}) = flip runReaderT circuitBreaker $ do
   case jsonFromText msg of
-    Right (WrappedLog{message = Error InvalidPayment}) -> handlePaymentError chan ref entry ts
-    Right (WrappedLog _ _)   -> resetError chan ref entry
+    Right (WrappedLog{message = Error InvalidPayment}) -> handlePaymentError entry ts
+    Right (WrappedLog _ _)   -> resetError entry
     _                        -> pure [ entry ]
 
-resetError :: Chan ByteString -> IORef CurrentState -> LogEntry -> IO [ LogEntry ]
-resetError chan ref entry = do
-  st <- readIORef ref
+controlCircuit _c EndOfLog = pure <$> logEntry "circuit-breaker" "\"Exiting\""
+
+resetError :: CircuitBreakerM m => LogEntry -> m [ LogEntry ]
+resetError entry@(LogEntry ts _) = do
+  st <- getState
   case st of
-    Broken{breakTime} -> do
+    Broken{breakTime} -> halfOpenCircuit breakTime
+    NotBroken{}       -> pure [ entry ]
+    HalfBroken{}      -> closeCircuit
+  where
+    halfOpenCircuit breakTime = do
       let
         newSt = HalfBroken breakTime
-        LogEntry ts _ = entry
-      writeIORef ref newSt
-      writeChan chan (LBS.toStrict $ encode RestoreCircuit)
+      changeState newSt
+      sendCommand RestoreCircuit
       pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt), entry ]
-    NotBroken{} -> pure [ entry ]
-    HalfBroken{} -> writeIORef ref newSt >> pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt), entry ]
-      where
+    closeCircuit = do
+      let
         newSt = NotBroken Nothing 0
-        LogEntry ts _ = entry
+      changeState newSt
+      pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt), entry ]
 
+resetError _ = error "this should never happen"
 
-handlePaymentError :: Chan ByteString -> IORef CurrentState -> LogEntry -> UTCTime -> IO [ LogEntry ]
-handlePaymentError chan ref entry ts = do
-  st <- readIORef ref
+handlePaymentError :: CircuitBreakerM m => LogEntry -> UTCTime -> m [ LogEntry ]
+handlePaymentError entry ts = do
+  st <- getState
   case st of
     NotBroken Nothing 0 -> resetLastError
     NotBroken (Just startTime) n
       | diffUTCTime ts startTime < 10 -> incrementErrorCount startTime n
       | otherwise                     -> resetLastError
-    HalfBroken _ -> do
-      newSt <- breakCircuit
-      pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt) , entry ]
+    HalfBroken _ -> breakCircuit
     _ -> pure [ entry ]
 
   where
     resetLastError = do
       let newSt = NotBroken (Just ts) 1
-      writeIORef ref newSt
-      pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt) , entry ]
+      changeState newSt
+      pure [ logCircuitBreaker ts newSt , entry ]
 
-    incrementErrorCount startTime n =  do
-      newState <- if (n >= 2)
-        then breakCircuit
-        else updateErrorCount startTime (n + 1)
-      pure [ LogEntry ts (Message "circuit-breaker" $ encode newState) , entry ]
+    incrementErrorCount startTime n
+      | n >= 2    = breakCircuit
+      | otherwise = updateErrorCount startTime (n + 1)
 
     breakCircuit = do
       let newSt = Broken ts
-      writeChan chan (LBS.toStrict $ encode BreakCircuit)
-      return newSt
+      sendCommand BreakCircuit
+      pure [ logCircuitBreaker ts newSt , entry ]
 
     updateErrorCount startTime n = do
       let newSt = NotBroken (Just startTime) n
-      writeIORef ref newSt
-      pure newSt
+      changeState newSt
+      pure [ logCircuitBreaker ts newSt , entry ]

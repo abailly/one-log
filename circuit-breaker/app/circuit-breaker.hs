@@ -14,4 +14,4 @@ import           OneLog.CircuitBreaker
 main :: IO ()
 main = do
   ref <- newIORef initialState
-  controlMain (\ chan -> controlCircuit chan ref)
+  controlMain (\ chan -> controlCircuit (CircuitBreaker chan ref))
