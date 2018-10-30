@@ -56,7 +56,7 @@ spec = describe "Circuit Breaker" $ do
 
   describe "when circuit is broken" $ do
 
-    it "opens circuit given 30s have passed" $ do
+    it "half-open circuit given 30s have passed letting through one request" $ do
       let thirtySecondsLater = addUTCTime 30 time
       ref <- newIORef $ Broken time
       chan <- newControlChannel
@@ -64,4 +64,29 @@ spec = describe "Circuit Breaker" $ do
       let entry = LogEntry thirtySecondsLater (Message "petstore"  $ encode (WrappedLog time (UserLoggedIn $ User "bob")))
 
       controlCircuit chan ref entry
-        `shouldReturn` [ LogEntry thirtySecondsLater (Message "circuit-breaker" $ encode (NotBroken Nothing 0)), entry ]
+        `shouldReturn` [ LogEntry thirtySecondsLater (Message "circuit-breaker" $ encode (HalfBroken time)), entry ]
+
+      decode . LBS.fromStrict <$> readChan chan `shouldReturn` Just RestoreCircuit
+
+  describe "when circuit is half-open" $ do
+
+    it "restores circuit given payment succeeds" $ do
+      ref <- newIORef $ HalfBroken time
+      chan <- newControlChannel
+
+      let entry = LogEntry time (Message "petstore"  $ encode (WrappedLog time (CheckedOutBasket (User "bob") (Payment "1234") 100)))
+
+      controlCircuit chan ref entry
+        `shouldReturn` [ LogEntry time (Message "circuit-breaker" $ encode (NotBroken Nothing 0)), entry ]
+
+    it "close circuit again given payment fails" $ do
+      let tenSecondsLater = addUTCTime 10 time
+      ref <- newIORef $ HalfBroken time
+      chan <- newControlChannel
+
+      let entry = LogEntry tenSecondsLater (Message "petstore"  $ encode (WrappedLog tenSecondsLater (Error InvalidPayment)))
+
+      controlCircuit chan ref entry
+        `shouldReturn` [ LogEntry tenSecondsLater (Message "circuit-breaker" $ encode (Broken tenSecondsLater)), entry ]
+
+      decode . LBS.fromStrict <$> readChan chan `shouldReturn` Just BreakCircuit

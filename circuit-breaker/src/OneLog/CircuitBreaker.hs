@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 module OneLog.CircuitBreaker where
@@ -22,6 +23,7 @@ data CurrentState = NotBroken { firstError :: Maybe UTCTime
                               , errorCount :: Int
                               }
                   | Broken { breakTime :: UTCTime }
+                  | HalfBroken { breakTime :: UTCTime }
                   deriving(Show, Generic, ToJSON)
 
 initialState :: CurrentState
@@ -32,14 +34,25 @@ controlCircuit _chan _ref EndOfLog = pure <$> logEntry "circuit-breaker" "\"Exit
 controlCircuit chan ref entry@(LogEntry ts Message{..}) = do
   case jsonFromText msg of
     Right (WrappedLog{message = Error InvalidPayment}) -> handlePaymentError chan ref entry ts
-    Right (WrappedLog _ _)   -> resetError ref entry
-    _                            -> pure [ entry ]
+    Right (WrappedLog _ _)   -> resetError chan ref entry
+    _                        -> pure [ entry ]
 
 resetError :: Chan ByteString -> IORef CurrentState -> LogEntry -> IO [ LogEntry ]
 resetError chan ref entry = do
   st <- readIORef ref
   case st of
-    Broken{breakTime} -> case  entry of
+    Broken{breakTime} -> do
+      let
+        newSt = HalfBroken breakTime
+        LogEntry ts _ = entry
+      writeIORef ref newSt
+      writeChan chan (LBS.toStrict $ encode RestoreCircuit)
+      pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt), entry ]
+    NotBroken{} -> pure [ entry ]
+    HalfBroken{} -> writeIORef ref newSt >> pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt), entry ]
+      where
+        newSt = NotBroken Nothing 0
+        LogEntry ts _ = entry
 
 
 handlePaymentError :: Chan ByteString -> IORef CurrentState -> LogEntry -> UTCTime -> IO [ LogEntry ]
@@ -50,6 +63,9 @@ handlePaymentError chan ref entry ts = do
     NotBroken (Just startTime) n
       | diffUTCTime ts startTime < 10 -> incrementErrorCount startTime n
       | otherwise                     -> resetLastError
+    HalfBroken _ -> do
+      newSt <- breakCircuit
+      pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt) , entry ]
     _ -> pure [ entry ]
 
   where
