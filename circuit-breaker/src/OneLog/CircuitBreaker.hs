@@ -45,12 +45,10 @@ logCircuitBreaker :: ToJSON a => UTCTime -> a -> LogEntry
 logCircuitBreaker ts = LogEntry ts . Message "circuit-breaker" . encode
 
 sendCommand :: CircuitBreakerM m => ToJSON a => a -> m ()
-sendCommand c = asks controlChannel >>= \ chan -> liftIO $ writeChan chan (LBS.toStrict $ encode c)
+sendCommand c = asks controlChannel >>= liftIO . flip writeChan (LBS.toStrict $ encode c)
 
 changeState :: CircuitBreakerM m => CurrentState -> m ()
-changeState st = do
-  ref <- asks stateRef
-  liftIO $ writeIORef ref st
+changeState st = asks stateRef >>= liftIO . flip writeIORef st
 
 getState :: CircuitBreakerM m => m CurrentState
 getState = asks stateRef >>= liftIO . readIORef
@@ -60,9 +58,9 @@ type CircuitBreakerM m = (MonadReader CircuitBreaker m, MonadIO m)
 -- * Circuit Breaker Logic
 
 controlCircuit :: CircuitBreaker -> Controller
-controlCircuit circuitBreaker entry@(LogEntry ts Message{..}) = flip runReaderT circuitBreaker $ do
+controlCircuit circuitBreaker entry@(LogEntry _ Message{..}) = flip runReaderT circuitBreaker $ do
   case jsonFromText msg of
-    Right (WrappedLog{message = Error InvalidPayment}) -> handlePaymentError entry ts
+    Right (WrappedLog{message = Error InvalidPayment}) -> handlePaymentError entry
     Right (WrappedLog _ _)   -> resetError entry
     _                        -> pure [ entry ]
 
@@ -90,8 +88,9 @@ resetError entry@(LogEntry ts _) = do
 
 resetError _ = error "this should never happen"
 
-handlePaymentError :: CircuitBreakerM m => LogEntry -> UTCTime -> m [ LogEntry ]
-handlePaymentError entry ts = do
+handlePaymentError :: CircuitBreakerM m => LogEntry -> m [ LogEntry ]
+handlePaymentError EndOfLog = error "should never get there"
+handlePaymentError entry@(LogEntry ts _) = do
   st <- getState
   case st of
     NotBroken Nothing 0 -> resetLastError
