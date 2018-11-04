@@ -59,63 +59,72 @@ type CircuitBreakerM m = (MonadReader CircuitBreaker m, MonadIO m)
 
 controlCircuit :: CircuitBreaker -> Controller
 controlCircuit circuitBreaker entry@(LogEntry _ Message{..}) = flip runReaderT circuitBreaker $ do
-  case jsonFromText msg of
-    Right (WrappedLog{message = Error InvalidPayment}) -> handlePaymentError entry
-    Right (WrappedLog _ _)   -> resetError entry
-    _                        -> pure [ entry ]
+  (controlMessage, logOutput, newState) <- getState >>= pure . circuitBreakerFSM entry
+  changeState newState
+  maybe (pure ()) sendCommand controlMessage
+  pure logOutput
 
 controlCircuit _c EndOfLog = pure <$> logEntry "circuit-breaker" "\"Exiting\""
 
-resetError :: CircuitBreakerM m => LogEntry -> m [ LogEntry ]
-resetError entry@(LogEntry ts _) = do
-  st <- getState
+type Transition = (Maybe Command,[ LogEntry], CurrentState)
+
+circuitBreakerFSM :: LogEntry -> CurrentState -> Transition
+circuitBreakerFSM entry@(LogEntry _ Message{..}) st =
+  case jsonFromText msg of
+    Right (WrappedLog{message = Error InvalidPayment})
+      -> handlePaymentError entry st
+    Right (WrappedLog _ _)
+      -> resetError entry st
+    _
+      -> (Nothing, [ entry ], st)
+
+circuitBreakerFSM EndOfLog st = (Nothing,[],st)
+
+resetError :: LogEntry -> CurrentState -> Transition
+resetError entry@(LogEntry ts _) st = do
   case st of
     Broken{breakTime} -> halfOpenCircuit breakTime
-    NotBroken{}       -> pure [ entry ]
+    NotBroken{}       -> (Nothing, [ entry ], st)
     HalfBroken{}      -> closeCircuit
   where
-    halfOpenCircuit breakTime = do
-      let
-        newSt = HalfBroken breakTime
-      changeState newSt
-      sendCommand RestoreCircuit
-      pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt), entry ]
-    closeCircuit = do
-      let
-        newSt = NotBroken Nothing 0
-      changeState newSt
-      pure [ LogEntry ts (Message "circuit-breaker" $ encode newSt), entry ]
+    halfOpenCircuit breakTime =
+      let newSt = HalfBroken breakTime
+      in (Just RestoreCircuit, [ LogEntry ts (Message "circuit-breaker" $ encode newSt), entry ], newSt)
 
-resetError _ = error "this should never happen"
+    closeCircuit =
+      let  newSt = NotBroken Nothing 0
+      in (Nothing, [ LogEntry ts (Message "circuit-breaker" $ encode newSt), entry ], newSt)
 
-handlePaymentError :: CircuitBreakerM m => LogEntry -> m [ LogEntry ]
-handlePaymentError EndOfLog = error "should never get there"
-handlePaymentError entry@(LogEntry ts _) = do
-  st <- getState
+resetError _ _ = error "this should never happen"
+
+handlePaymentError :: LogEntry -> CurrentState -> Transition
+handlePaymentError entry@(LogEntry ts _) st = do
   case st of
-    NotBroken Nothing 0 -> resetLastError
+    NotBroken Nothing 0
+      -> resetLastError
     NotBroken (Just startTime) n
       | diffUTCTime ts startTime < 10 -> incrementErrorCount startTime n
       | otherwise                     -> resetLastError
-    HalfBroken _ -> breakCircuit
-    _ -> pure [ entry ]
+    HalfBroken _
+      -> breakCircuit
+    _
+      -> (Nothing, [ entry ], st)
 
   where
-    resetLastError = do
+    resetLastError =
       let newSt = NotBroken (Just ts) 1
-      changeState newSt
-      pure [ logCircuitBreaker ts newSt , entry ]
+      in (Nothing, [ logCircuitBreaker ts newSt , entry ], newSt)
 
     incrementErrorCount startTime n
       | n >= 2    = breakCircuit
       | otherwise = updateErrorCount startTime (n + 1)
 
-    breakCircuit = do
+    breakCircuit =
       let newSt = Broken ts
-      sendCommand BreakCircuit
-      pure [ logCircuitBreaker ts newSt , entry ]
+      in (Just BreakCircuit, [ logCircuitBreaker ts newSt , entry ], newSt)
 
-    updateErrorCount startTime n = do
+    updateErrorCount startTime n =
       let newSt = NotBroken (Just startTime) n
-      changeState newSt
-      pure [ logCircuitBreaker ts newSt , entry ]
+      in (Nothing, [ logCircuitBreaker ts newSt , entry ], newSt)
+
+handlePaymentError EndOfLog _ = error "should never get there"
