@@ -83,9 +83,10 @@ circuitBreakerFSM EndOfLog st = (Nothing,[],st)
 resetError :: LogEntry -> CurrentState -> Transition
 resetError entry@(LogEntry ts _) st = do
   case st of
-    Broken{breakTime} -> halfOpenCircuit breakTime
-    NotBroken{}       -> (Nothing, [ entry ], st)
+    Broken{breakTime}
+      | diffUTCTime ts breakTime >= 30 -> halfOpenCircuit breakTime
     HalfBroken{}      -> closeCircuit
+    _       -> (Nothing, [ entry ], st)
   where
     halfOpenCircuit breakTime =
       let newSt = HalfBroken breakTime
