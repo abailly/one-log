@@ -1,31 +1,41 @@
+{-# LANGUAGE PatternSynonyms #-}
 module OneLog.Transduction where
 
-import           Data.GraphViz
-import qualified Data.Map            as Map
+import           Data.GraphViz        (DotGraph, parseDotGraph)
+import qualified Data.Map             as Map
 import           Data.Rewriting.Rule
 --import           Data.Rewriting.Rules.Rewrite
 import           Data.String
 import           Data.Text.Lazy
-import           Data.Text.Lazy.IO   as TIO
+import           Data.Text.Lazy.IO    as TIO
 import           Text.Parsec
---import           Text.Parsec.Text
+import           Text.Parsec.Language (haskellDef)
+import           Text.Parsec.Token
 
-newtype STerm = STerm { term :: Term String String }
+data Fun = O
+         | K String
+         -- ^A key identifier mapped to some value
+         | S String
+         -- ^A literal string
   deriving (Show, Eq)
 
-type SRule = Rule String String
+type STerm = Term Fun String
+type SRule = Rule Fun String
+
+pattern Obj :: String -> STerm -> STerm
+pattern Obj s v = Fun (K s) [ v ]
+
+pattern Str :: String -> STerm
+pattern Str s = Fun (S s) []
 
 aterm :: STerm
-aterm = STerm $ Fun "foo" [Fun "bar" [Var "x", Var "y"]]
+aterm = Fun (K "foo") [Fun O [Var "x", Var "y"]]
 
 arule :: SRule
-arule = Rule (Fun "foo" [ Var "z"]) (Fun "bar" [ Fun "qix" [ Var "z" , Var "z" ]])
+arule = Rule (Fun (K "foo") [ Var "z"]) (Fun O [ Fun O [ Var "z" , Var "z" ]])
 
 rule :: STerm -> STerm -> SRule
-rule (STerm lhs) (STerm rhs) = Rule lhs rhs
-
-instance IsString STerm where
-  fromString = STerm . Var
+rule lhs rhs = Rule lhs rhs
 
 -- | A (Rational) `Transduction` is formally a directed graph whose edges are labelled with
 -- pair of rational expressions from 2 alphabets, the input and the output languages.
@@ -42,12 +52,14 @@ type Q = Int
 -- | A Rule as the form:
 -- lhs_term '->' ( '[' condition ']' )? rhs_term
 parseRule :: Text -> Either ParseError SRule
-parseRule = runParser termParser () ""
+parseRule = runParser ruleParser () ""  . unpack
   where
-    termParser = rule <$> lhsParser <*> (arrow *> rhsParser)
+    ruleParser = rule <$> lhsParser <*> (arrow *> rhsParser)
     arrow = spaces *> string "->" <* spaces
-    lhsParser = undefined
-    rhsParser = undefined
+    lhsParser = termParser
+    rhsParser = termParser
+    lexer = makeTokenParser haskellDef
+    termParser = Str <$> stringLiteral lexer
 
 parseGraph :: FilePath -> IO (DotGraph Text)
 parseGraph fp = do

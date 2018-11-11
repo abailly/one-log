@@ -8,8 +8,9 @@ import           Prelude                    hiding ((.))
 --import           Data.Text                  (unlines)
 --import           Data.Time.Clock
 import           Data.FileEmbed             (makeRelativeToProject)
+import           Data.Rewriting.Rule
 import           Language.Haskell.TH.Syntax (Exp (LitE), Lit (StringL))
---import           OneLog.Transduction
+import           OneLog.Transduction
 import           System.IO
 import           Test.Hspec
 
@@ -24,5 +25,5 @@ spec = describe "Transductions" $ do
       pending
 
   describe "Terms Parser" $ do
-    it "parses " $ do
-      pending -- parseRule "foo -> bar" `shouldBe` Right (rule "foo" "bar")
+    it "parses simple string rewrite rule" $ do
+      parseRule "\"foo\" -> \"bar\"" `shouldBe` Right (rule (Str "foo") (Str "bar"))
