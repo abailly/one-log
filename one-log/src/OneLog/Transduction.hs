@@ -56,10 +56,14 @@ parseRule = runParser ruleParser () ""  . unpack
   where
     ruleParser = rule <$> lhsParser <*> (arrow *> rhsParser)
     arrow = spaces *> string "->" <* spaces
+
     lhsParser = termParser
     rhsParser = termParser
+
+    termParser = (Str <$> stringLiteral lexer <?> "string literal")
+                 <|> (Var <$> identifier lexer <?> "variable")
+
     lexer = makeTokenParser haskellDef
-    termParser = Str <$> stringLiteral lexer
 
 parseGraph :: FilePath -> IO (DotGraph Text)
 parseGraph fp = do

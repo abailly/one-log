@@ -49,15 +49,15 @@ doRun = do
 
   let procs = [ ( "java",  [ "-jar" , "./pet-store-payment/target/pet-store-payment-1.0-SNAPSHOT.jar", "server", "payment-conf.yaml" ],  ".")
               , ( "circuit-breaker", [ "pet-store-server", "Dev" , "9090", "localhost", "8080" ], ".")
-              -- , ( "osquerys",  [ "osquery.conf", "test_server.pem" , "test_server.key", "8088" ],  ".")
-              -- , ( "osqueryd",  [ "--verbose",  "--ephemeral", "--disable_database", "--tls_hostname",  "localhost:8088"
-              --                  , "--tls_server_certs",  "test_server_ca.pem"
-              --                  , "--config_plugin", "tls"
-              --                  , "--config_tls_endpoint",  "/config"
-              --                  , "--logger_tls_endpoint", "/logger"
-              --                  , "--logger_plugin",  "tls"
-              --                  , "--enroll_tls_endpoint", "/enroll", "--enroll_secret_path", "secret.txt"
-              --                  ],  ".")
+              , ( "osquerys",  [ "osquery.conf", "test_server.pem" , "test_server.key", "8088" ],  ".")
+              , ( "osqueryd",  [ "--verbose",  "--ephemeral", "--disable_database", "--tls_hostname",  "localhost:8088"
+                               , "--tls_server_certs",  "test_server_ca.pem"
+                               , "--config_plugin", "tls"
+                               , "--config_tls_endpoint",  "/config"
+                               , "--logger_tls_endpoint", "/logger"
+                               , "--logger_plugin",  "tls"
+                               , "--enroll_tls_endpoint", "/enroll", "--enroll_secret_path", "secret.txt"
+                               ],  ".")
               ]
 
   ps <- concat <$> mapM (\ ((name, args, dir), clr) -> spawnProc clr q name args dir) (zip procs genColors)

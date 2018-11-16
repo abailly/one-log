@@ -27,3 +27,6 @@ spec = describe "Transductions" $ do
   describe "Terms Parser" $ do
     it "parses simple string rewrite rule" $ do
       parseRule "\"foo\" -> \"bar\"" `shouldBe` Right (rule (Str "foo") (Str "bar"))
+
+    it "parses variable rewrite rule" $ do
+      parseRule "foo -> bar" `shouldBe` Right (rule (Var "foo") (Var "bar"))
