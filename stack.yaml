@@ -1,9 +1,5 @@
 flags: {}
 packages:
-  - location:
-      git: 'https://github.com/abailly/ioautomata.git'
-      commit: 'c68ccf4'
-    extra-dep: true
   - 'pet-store'
   - 'pet-store-backend'
   - 'osquery-server'
@@ -11,16 +7,8 @@ packages:
   - 'log-controller'
   - 'circuit-breaker'
 extra-deps:
-  - unagi-chan-0.4.0.0
-  - MonadPrompt-1.0.0.5
-  - term-rewriting-0.2.1.1
-  - multiset-0.3.4
-  - union-find-array-0.1.0.2
-resolver: lts-12.5
-image:
-  containers:
-    -
-      base: "fpco/stack-run"
-      name: "aleryo/pet-store"
-      entrypoints:
-        - pet-store-server
+  - git: 'https://github.com/abailly/ioautomata.git'
+    commit: 'e2e5816611d7166f58ecdd299f7f6d2776983f70'
+  - term-rewriting-0.4.0.2@sha256:5412f6aa29c5756634ee30e8df923c83ab9f012a4b8797c460af3d7078466764,2740
+  - union-find-array-0.1.0.2@sha256:38c2dfbae3de48d8962f202ec5c4d6323ac767d6838b85e8d340c3608d6c0f21,1406
+resolver: lts-14.20

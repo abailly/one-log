@@ -8,15 +8,11 @@ module OneLog.CircuitBreaker where
 
 import           Control.Concurrent.Chan
 import           Control.Monad.Reader
-import           Data.Aeson              (FromJSON, ToJSON, encode)
+import           Data.Aeson              (ToJSON, encode)
 import           Data.ByteString         (ByteString)
 import qualified Data.ByteString.Lazy    as LBS
 import           Data.IORef
-import           Data.Time.Clock
-import           GHC.Generics
 import           Log.Control
-import           PetStore.Control
-import           PetStore.Messages
 import OneLog.CircuitBreakerSM
 
 -- * Low-level Operations on Circuit Breaker
@@ -31,9 +27,6 @@ data CircuitBreaker = CircuitBreaker { controlChannel :: Chan ByteString
 
 initialState :: CurrentState
 initialState = NotBroken Nothing 0
-
-logCircuitBreaker :: ToJSON a => UTCTime -> a -> LogEntry
-logCircuitBreaker ts = LogEntry ts . Message "circuit-breaker" . encode
 
 sendCommand :: CircuitBreakerM m => ToJSON a => a -> m ()
 sendCommand c = asks controlChannel >>= liftIO . flip writeChan (LBS.toStrict $ encode c)
